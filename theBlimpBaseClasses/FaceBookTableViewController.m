@@ -16,7 +16,7 @@
 @interface FaceBookTableViewController ()
 @property (nonatomic, strong) FBRequest *facebookRequest;
 @property (nonatomic, strong) NSMutableDictionary *photoDictionary;
-@property (nonatomic, strong) NSMutableDictionary *appConfiguration;
+@property(nonatomic, strong) NSMutableDictionary *appConfiguration;
 
 - (void)facebookInit;
 @end
