@@ -1,0 +1,402 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BEF4248415D6E2DF00C647BC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4248315D6E2DF00C647BC /* Foundation.framework */; };
+		BEF4248A15D6E2DF00C647BC /* theBlimpBaseClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = BEF4248915D6E2DF00C647BC /* theBlimpBaseClasses.m */; };
+		BEF4249215D6E2DF00C647BC /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4249115D6E2DF00C647BC /* SenTestingKit.framework */; };
+		BEF4249415D6E2DF00C647BC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4249315D6E2DF00C647BC /* UIKit.framework */; };
+		BEF4249515D6E2DF00C647BC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4248315D6E2DF00C647BC /* Foundation.framework */; };
+		BEF4249815D6E2DF00C647BC /* libtheBlimpBaseClasses.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4248015D6E2DF00C647BC /* libtheBlimpBaseClasses.a */; };
+		BEF4249E15D6E2DF00C647BC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BEF4249C15D6E2DF00C647BC /* InfoPlist.strings */; };
+		BEF424A115D6E2DF00C647BC /* theBlimpBaseClassesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BEF424A015D6E2DF00C647BC /* theBlimpBaseClassesTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BEF4249615D6E2DF00C647BC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BEF4247715D6E2DF00C647BC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BEF4247F15D6E2DF00C647BC;
+			remoteInfo = theBlimpBaseClasses;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		BEF4248015D6E2DF00C647BC /* libtheBlimpBaseClasses.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtheBlimpBaseClasses.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BEF4248315D6E2DF00C647BC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		BEF4248715D6E2DF00C647BC /* theBlimpBaseClasses-Prefix.pch */ = {isa = PBXFileReference; path = "theBlimpBaseClasses-Prefix.pch"; sourceTree = "<group>"; };
+		BEF4248815D6E2DF00C647BC /* theBlimpBaseClasses.h */ = {isa = PBXFileReference; path = theBlimpBaseClasses.h; sourceTree = "<group>"; };
+		BEF4248915D6E2DF00C647BC /* theBlimpBaseClasses.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = theBlimpBaseClasses.m; sourceTree = "<group>"; };
+		BEF4249015D6E2DF00C647BC /* theBlimpBaseClassesTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = theBlimpBaseClassesTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BEF4249115D6E2DF00C647BC /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		BEF4249315D6E2DF00C647BC /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		BEF4249B15D6E2DF00C647BC /* theBlimpBaseClassesTests-Info.plist */ = {isa = PBXFileReference; path = "theBlimpBaseClassesTests-Info.plist"; sourceTree = "<group>"; };
+		BEF4249D15D6E2DF00C647BC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		BEF4249F15D6E2DF00C647BC /* theBlimpBaseClassesTests.h */ = {isa = PBXFileReference; path = theBlimpBaseClassesTests.h; sourceTree = "<group>"; };
+		BEF424A015D6E2DF00C647BC /* theBlimpBaseClassesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = theBlimpBaseClassesTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BEF4247D15D6E2DF00C647BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEF4248415D6E2DF00C647BC /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BEF4248C15D6E2DF00C647BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEF4249215D6E2DF00C647BC /* SenTestingKit.framework in Frameworks */,
+				BEF4249415D6E2DF00C647BC /* UIKit.framework in Frameworks */,
+				BEF4249515D6E2DF00C647BC /* Foundation.framework in Frameworks */,
+				BEF4249815D6E2DF00C647BC /* libtheBlimpBaseClasses.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BEF4247515D6E2DF00C647BC = {
+			isa = PBXGroup;
+			children = (
+				BEF4248515D6E2DF00C647BC /* theBlimpBaseClasses */,
+				BEF4249915D6E2DF00C647BC /* theBlimpBaseClassesTests */,
+				BEF4248215D6E2DF00C647BC /* Frameworks */,
+				BEF4248115D6E2DF00C647BC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BEF4248115D6E2DF00C647BC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BEF4248015D6E2DF00C647BC /* libtheBlimpBaseClasses.a */,
+				BEF4249015D6E2DF00C647BC /* theBlimpBaseClassesTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BEF4248215D6E2DF00C647BC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BEF4248315D6E2DF00C647BC /* Foundation.framework */,
+				BEF4249115D6E2DF00C647BC /* SenTestingKit.framework */,
+				BEF4249315D6E2DF00C647BC /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BEF4248515D6E2DF00C647BC /* theBlimpBaseClasses */ = {
+			isa = PBXGroup;
+			children = (
+				BEF4248815D6E2DF00C647BC /* theBlimpBaseClasses.h */,
+				BEF4248915D6E2DF00C647BC /* theBlimpBaseClasses.m */,
+				BEF4248615D6E2DF00C647BC /* Supporting Files */,
+			);
+			path = theBlimpBaseClasses;
+			sourceTree = "<group>";
+		};
+		BEF4248615D6E2DF00C647BC /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BEF4248715D6E2DF00C647BC /* theBlimpBaseClasses-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		BEF4249915D6E2DF00C647BC /* theBlimpBaseClassesTests */ = {
+			isa = PBXGroup;
+			children = (
+				BEF4249F15D6E2DF00C647BC /* theBlimpBaseClassesTests.h */,
+				BEF424A015D6E2DF00C647BC /* theBlimpBaseClassesTests.m */,
+				BEF4249A15D6E2DF00C647BC /* Supporting Files */,
+			);
+			path = theBlimpBaseClassesTests;
+			sourceTree = "<group>";
+		};
+		BEF4249A15D6E2DF00C647BC /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BEF4249B15D6E2DF00C647BC /* theBlimpBaseClassesTests-Info.plist */,
+				BEF4249C15D6E2DF00C647BC /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		BEF4247E15D6E2DF00C647BC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		BEF4247F15D6E2DF00C647BC /* theBlimpBaseClasses */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BEF424A415D6E2DF00C647BC /* Build configuration list for PBXNativeTarget "theBlimpBaseClasses" */;
+			buildPhases = (
+				BEF4247C15D6E2DF00C647BC /* Sources */,
+				BEF4247D15D6E2DF00C647BC /* Frameworks */,
+				BEF4247E15D6E2DF00C647BC /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = theBlimpBaseClasses;
+			productName = theBlimpBaseClasses;
+			productReference = BEF4248015D6E2DF00C647BC /* libtheBlimpBaseClasses.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		BEF4248F15D6E2DF00C647BC /* theBlimpBaseClassesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BEF424A715D6E2DF00C647BC /* Build configuration list for PBXNativeTarget "theBlimpBaseClassesTests" */;
+			buildPhases = (
+				BEF4248B15D6E2DF00C647BC /* Sources */,
+				BEF4248C15D6E2DF00C647BC /* Frameworks */,
+				BEF4248D15D6E2DF00C647BC /* Resources */,
+				BEF4248E15D6E2DF00C647BC /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BEF4249715D6E2DF00C647BC /* PBXTargetDependency */,
+			);
+			name = theBlimpBaseClassesTests;
+			productName = theBlimpBaseClassesTests;
+			productReference = BEF4249015D6E2DF00C647BC /* theBlimpBaseClassesTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BEF4247715D6E2DF00C647BC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = BEF4247A15D6E2DF00C647BC /* Build configuration list for PBXProject "theBlimpBaseClasses" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BEF4247515D6E2DF00C647BC;
+			productRefGroup = BEF4248115D6E2DF00C647BC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BEF4247F15D6E2DF00C647BC /* theBlimpBaseClasses */,
+				BEF4248F15D6E2DF00C647BC /* theBlimpBaseClassesTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BEF4248D15D6E2DF00C647BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEF4249E15D6E2DF00C647BC /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BEF4248E15D6E2DF00C647BC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BEF4247C15D6E2DF00C647BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEF4248A15D6E2DF00C647BC /* theBlimpBaseClasses.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BEF4248B15D6E2DF00C647BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEF424A115D6E2DF00C647BC /* theBlimpBaseClassesTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BEF4249715D6E2DF00C647BC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BEF4247F15D6E2DF00C647BC /* theBlimpBaseClasses */;
+			targetProxy = BEF4249615D6E2DF00C647BC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		BEF4249C15D6E2DF00C647BC /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BEF4249D15D6E2DF00C647BC /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		BEF424A215D6E2DF00C647BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		BEF424A315D6E2DF00C647BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BEF424A515D6E2DF00C647BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/theBlimpBaseClasses.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "theBlimpBaseClasses/theBlimpBaseClasses-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		BEF424A615D6E2DF00C647BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/theBlimpBaseClasses.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "theBlimpBaseClasses/theBlimpBaseClasses-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		BEF424A815D6E2DF00C647BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "theBlimpBaseClasses/theBlimpBaseClasses-Prefix.pch";
+				INFOPLIST_FILE = "theBlimpBaseClassesTests/theBlimpBaseClassesTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		BEF424A915D6E2DF00C647BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "theBlimpBaseClasses/theBlimpBaseClasses-Prefix.pch";
+				INFOPLIST_FILE = "theBlimpBaseClassesTests/theBlimpBaseClassesTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BEF4247A15D6E2DF00C647BC /* Build configuration list for PBXProject "theBlimpBaseClasses" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BEF424A215D6E2DF00C647BC /* Debug */,
+				BEF424A315D6E2DF00C647BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BEF424A415D6E2DF00C647BC /* Build configuration list for PBXNativeTarget "theBlimpBaseClasses" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BEF424A515D6E2DF00C647BC /* Debug */,
+				BEF424A615D6E2DF00C647BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		BEF424A715D6E2DF00C647BC /* Build configuration list for PBXNativeTarget "theBlimpBaseClassesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BEF424A815D6E2DF00C647BC /* Debug */,
+				BEF424A915D6E2DF00C647BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BEF4247715D6E2DF00C647BC /* Project object */;
+}
