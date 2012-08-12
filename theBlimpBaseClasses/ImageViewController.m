@@ -41,7 +41,7 @@
     
     NSURL *urlForProfile = [NSURL URLWithString:urlStringForProfile];
     UIBarButtonItem *oldBarButtonItem = self.navigationBar.topItem.leftBarButtonItem;
-    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     [spinner startAnimating];
     UIBarButtonItem *spinnerButton = [[UIBarButtonItem alloc] initWithCustomView:spinner];
     self.navigationBar.topItem.rightBarButtonItem = spinnerButton;
