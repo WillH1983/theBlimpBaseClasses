@@ -56,8 +56,10 @@
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
 	self.activityIndicator.hidesWhenStopped = YES;
     
+    NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
+    
     //Pull the full comments dictionary from the delegate to use as our Model
-    [self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:[self.shortCommentsDictionaryModel objectForKey:@"id"]];
+    [self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:graphAPIString];
     
 }
 
@@ -105,6 +107,37 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (void)likeButtonPressed:(id)sender
+{
+    UIView *contentView = [sender superview];
+    UITableViewCell *cell = (UITableViewCell *)[contentView superview];
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+    NSDictionary *dictionaryData = [self.commentsArray objectAtIndex:indexPath.row];
+    
+    NSString *graphAPIString = [NSString stringWithFormat:@"%@/likes", [dictionaryData valueForKeyPath:@"id"]];
+    UIButton *likeButton = sender;
+    
+    if ([likeButton.titleLabel.text isEqualToString:@"Like"])
+    {
+        //[self.facebook requestWithGraphPath:graphAPIString andParams:[[NSMutableDictionary alloc]init] andHttpMethod:@"POST" andDelegate:self];
+        [self.socialMediaDelegate SocialMediaDetailViewController:self 
+                                postDataForFacebookGraphAPIString:graphAPIString 
+                                                   withParameters:[[NSMutableDictionary alloc]init]];
+        
+        [likeButton setTitle:@"Unlike" forState:UIControlStateNormal]; 
+        
+    }
+    else {
+        //[self.facebook requestWithGraphPath:graphAPIString andParams:[[NSMutableDictionary alloc] init] andHttpMethod:@"DELETE" andDelegate:self];
+        [self.socialMediaDelegate SocialMediaDetailViewController:self 
+                              deleteDataForFacebookGraphAPIString:graphAPIString
+                                                   withParameters:[[NSMutableDictionary alloc]init]];
+        
+        [likeButton setTitle:@"Like" forState:UIControlStateNormal];
+    }
+    
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -131,6 +164,7 @@
     UIImageView *profileImageView = nil;
     UILabel *name = nil;
     UITextView *comment = nil;
+    UIButton *likeButton = nil;
     
     //If there is no reusable cell of this type, create a new one
     if (!cell)
@@ -142,6 +176,9 @@
     name = (UILabel *)[cell.contentView viewWithTag:1];
     comment = (UITextView *)[cell.contentView viewWithTag:2];
     
+    likeButton = (UIButton *)[cell.contentView viewWithTag:4];
+    [likeButton addTarget:self action:@selector(likeButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    
     profileImageView.image = nil;
     
     //Retrieve the corresponding dictionary for the cell, retrieve the main and detail text
@@ -149,9 +186,25 @@
     NSDictionary *dictionaryForCell = [self.commentsArray objectAtIndex:[indexPath row]];
     NSString *mainTextLabel = [dictionaryForCell valueForKeyPath:@"message"];
     NSString *detailTextLabel = [dictionaryForCell valueForKeyPath:@"from.name"];
+    
+    NSNumber *user_likes = [dictionaryForCell valueForKeyPath:@"user_likes"];
+    if ([user_likes boolValue])
+    {
+        [likeButton setTitle:@"Unlike" forState:UIControlStateNormal];
+    }
+    else
+    {
+        [likeButton setTitle:@"Like" forState:UIControlStateNormal];
+    }
+    CGFloat oldSizeHeight = comment.frame.size.height;
+    
     comment.text = mainTextLabel;
-    [comment resizeTextViewForWidth:self.tableView.frame.size.width - comment.frame.origin.x - 30];
     name.text = detailTextLabel;
+    
+    [comment resizeTextViewForWidth:self.tableView.frame.size.width - comment.frame.origin.x - 30];
+    CGFloat heightChange = comment.frame.size.height - oldSizeHeight;
+    
+    likeButton.frame = CGRectMake(likeButton.frame.origin.x, likeButton.frame.origin.y + heightChange, likeButton.frame.size.width, likeButton.frame.size.height);
     
     return cell;
     
@@ -201,9 +254,15 @@
         
         //Set the cell text label's based upon the table contents array location
         UITextView *textView = (UITextView *)[cell.contentView viewWithTag:2];
+        UIButton *likeButton = (UIButton *)[cell.contentView viewWithTag:4];
         textView.text = dictionaryText;
+        
+        CGFloat oldSizeHeight = textView.frame.size.height;
+        
         [textView resizeTextViewForWidth:self.tableView.frame.size.width - textView.frame.origin.x - 30];
-        CGFloat height = textView.frame.origin.y + textView.frame.size.height;
+        CGFloat heightChange = textView.frame.size.height - oldSizeHeight;
+        likeButton.frame = CGRectMake(likeButton.frame.origin.x, likeButton.frame.origin.y + heightChange, likeButton.frame.size.width, likeButton.frame.size.height);
+        CGFloat height = likeButton.frame.origin.y + likeButton.frame.size.height;
         return height;
     }
     else return 44;
@@ -223,15 +282,15 @@
         UILabel *name = (UILabel *)[cell.contentView viewWithTag:1];
         UITextView *comment = (UITextView *)[cell.contentView viewWithTag:2];
         
-        NSString *typeOfPost = [self.fullCommentsDictionaryModel valueForKeyPath:@"type"];
-        NSString *commentString = [self.fullCommentsDictionaryModel valueForKeyPath:@"message"];
+        NSString *typeOfPost = [self.shortCommentsDictionaryModel valueForKeyPath:@"type"];
+        NSString *commentString = [self.shortCommentsDictionaryModel valueForKeyPath:@"message"];
         
         if ([typeOfPost isEqualToString:@"link"])
         {
             NSRange range = [commentString rangeOfString:@"http"];
             if (range.location == NSNotFound)
             {
-                NSString *linkURL = [self.fullCommentsDictionaryModel valueForKeyPath:@"link"];
+                NSString *linkURL = [self.shortCommentsDictionaryModel valueForKeyPath:@"link"];
                 if ([linkURL isKindOfClass:[NSString class]])
                 {
                     commentString = [commentString stringByAppendingString:@" "];
@@ -240,14 +299,14 @@
             }
         }
         
-        name.text = [self.fullCommentsDictionaryModel valueForKeyPath:@"from.name"];
+        name.text = [self.shortCommentsDictionaryModel valueForKeyPath:@"from.name"];
         comment.text = commentString;
         [comment resizeTextViewForWidth:self.tableView.frame.size.width - comment.frame.origin.x - 10];
         dispatch_queue_t downloadQueue = dispatch_queue_create("Profile Image Downloader", NULL);
         dispatch_async(downloadQueue, ^{
     
             //Create a URL based upon the facebook graph API
-            NSString *profileFromId = [self.fullCommentsDictionaryModel valueForKeyPath:@"from.id"];
+            NSString *profileFromId = [self.shortCommentsDictionaryModel valueForKeyPath:@"from.id"];
             NSString *urlString = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture", profileFromId];
             NSURL *url = [[NSURL alloc] initWithString:urlString];
             
@@ -277,15 +336,15 @@
     
     if (cell)
     {
-        NSString *typeOfPost = [self.fullCommentsDictionaryModel valueForKeyPath:@"type"];
-        NSString *commentString = [self.fullCommentsDictionaryModel valueForKeyPath:@"message"];
+        NSString *typeOfPost = [self.shortCommentsDictionaryModel valueForKeyPath:@"type"];
+        NSString *commentString = [self.shortCommentsDictionaryModel valueForKeyPath:@"message"];
         
         if ([typeOfPost isEqualToString:@"link"])
         {
             NSRange range = [commentString rangeOfString:@"http"];
             if (range.location == NSNotFound)
             {
-                NSString *linkURL = [self.fullCommentsDictionaryModel valueForKeyPath:@"link"];
+                NSString *linkURL = [self.shortCommentsDictionaryModel valueForKeyPath:@"link"];
                 if ([linkURL isKindOfClass:[NSString class]])
                 {
                     commentString = [commentString stringByAppendingString:@" "];
@@ -307,6 +366,12 @@
 
 - (void)request:(FBRequest *)request didLoad:(id)result
 {
+    //Since the RSS file has been loaded, stop animating the activity indicator
+    [self.activityIndicator stopAnimating];
+    
+    //If there is a right bar button item, put it back
+    self.navigationItem.rightBarButtonItem = self.oldBarButtonItem;
+    
     if ([request.httpMethod isEqualToString:@"GET"])
     {
         if ([result isKindOfClass:[NSDictionary class]])
@@ -315,21 +380,20 @@
             [self loadSocialMediaView];
         }
         //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
-        //Since the RSS file has been loaded, stop animating the activity indicator
-        [self.activityIndicator stopAnimating];
-
-        //If there is a right bar button item, put it back
-        self.navigationItem.rightBarButtonItem = self.oldBarButtonItem;
+    
     }
     else {
-        [self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:[self.shortCommentsDictionaryModel objectForKey:@"id"]];
+        NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
+        [self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:graphAPIString];
     }
+    
 }
 
 - (void)requestLoading:(FBRequest *)request
 {
     //When a facebook request starts, save the request
     //so the delegate can be set to nill when the view disappears
+    
     self.facebookRequest = request;
     
     [self.activityIndicator startAnimating];
@@ -391,17 +455,17 @@
     //Pull the original postData from the fullCommentsDictionaryModel that was retrieved
     //from SocialMediaDetailViewControllerDelegate, then use introspection to verify the 
     //postData is a String
-    id postData = [self.fullCommentsDictionaryModel objectForKey:@"message"];
+    id postData = [self.shortCommentsDictionaryModel objectForKey:@"message"];
     if ([postData isKindOfClass:[NSString class]]) self.textView.text = postData;
     
     //Pull all of the comments from the fullCommentsDictionaryModel and use introspection
     //to verify the commentsArray is actually an array or if the commentsArray is nil
     //We still want to set the comments array to nil so the table will be reloaded
-    id commentsArray = [self.fullCommentsDictionaryModel valueForKeyPath:@"comments.data"];
+    id commentsArray = [self.fullCommentsDictionaryModel valueForKeyPath:@"data"];
     if ([commentsArray isKindOfClass:[NSArray class]] || (!commentsArray)) self.commentsArray = commentsArray;
     
     //retrieve the profile ID from the controller model, and create a facebook graphi API URL
-    NSString *profileId = [self.fullCommentsDictionaryModel valueForKeyPath:@"from.id"];
+    NSString *profileId = [self.shortCommentsDictionaryModel valueForKeyPath:@"from.id"];
     NSString *urlStringForProfile = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture", profileId];
     
     //Verify the urlStringForProfile is not nil
@@ -448,7 +512,7 @@
     //and the view is closing.  The purpose of this function is to retireve the data
     //and post it to facebook using the graph API
     
-    NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.fullCommentsDictionaryModel valueForKeyPath:@"id"]];
+    NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
     [self.socialMediaDelegate SocialMediaDetailViewController:self postDataForFacebookGraphAPIString:graphAPIString withParameters:[[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil]];
 }
 

@@ -13,8 +13,16 @@
 @class SocialMediaDetailViewController;
 
 @protocol SocialMediaDetailViewControllerDelegate <NSObject>
-- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender dictionaryForFacebookGraphAPIString:(NSString *)facebookGraphAPIString;
-- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender postDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString withParameters:(NSMutableDictionary *)params;
+- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender
+    dictionaryForFacebookGraphAPIString:(NSString *)facebookGraphAPIString;
+
+- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender 
+      postDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString 
+                         withParameters:(NSMutableDictionary *)params;
+
+- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender 
+      deleteDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString 
+                         withParameters:(NSMutableDictionary *)params;
 
 @end
 

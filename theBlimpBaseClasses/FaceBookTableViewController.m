@@ -554,7 +554,8 @@
 
 #pragma mark - SocialMediaDetailView datasource
 
-- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender dictionaryForFacebookGraphAPIString:(NSString *)facebookGraphAPIString
+- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender
+    dictionaryForFacebookGraphAPIString:(NSString *)facebookGraphAPIString
 {
     NSLog(@"Loading Web Data - Social Media View Controller");
     
@@ -563,9 +564,22 @@
     [self.facebook requestWithGraphPath:facebookGraphAPIString andDelegate:sender];
 }
 
-- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender postDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString withParameters:(NSMutableDictionary *)params
+- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender
+      postDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString
+                         withParameters:(NSMutableDictionary *)params
 {
-    [self.facebook requestWithGraphPath:facebookGraphAPIString andParams:params andHttpMethod:@"POST" andDelegate:sender];
+    [self.facebook requestWithGraphPath:facebookGraphAPIString
+                              andParams:params andHttpMethod:@"POST"
+                            andDelegate:sender];
+}
+
+- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender 
+    deleteDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString 
+                         withParameters:(NSMutableDictionary *)params
+{
+    [self.facebook requestWithGraphPath:facebookGraphAPIString
+                              andParams:params andHttpMethod:@"DELETE"
+                            andDelegate:sender];
 }
 
 #pragma mark - Facebook Initialization Method
