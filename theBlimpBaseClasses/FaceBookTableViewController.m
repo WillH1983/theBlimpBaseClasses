@@ -379,6 +379,23 @@
     return cell;
 }
 
+- (UIImage *) getScaledImage:(UIImage *)img insideButton:(UIButton *)btn 
+{
+    
+    // Check which dimension (width or height) to pay respect to and
+    // calculate the scale factor
+    CGFloat imgRatio = img.size.width / img.size.height,
+    btnRatio = btn.frame.size.width / btn.frame.size.height,
+    scaleFactor = (imgRatio > btnRatio
+                   ? img.size.width / btn.frame.size.width
+                   : img.size.height / btn.frame.size.height);
+    
+    // Create image using scale factor
+    UIImage *scaledImg = [UIImage imageWithCGImage:[img CGImage] 
+                                             scale:scaleFactor 
+                                       orientation:UIImageOrientationUp];
+    return scaledImg;
+}
 
 #pragma mark - Table view delegate
 - (void)tableView:(UITableView *)tableview willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -427,7 +444,8 @@
                 UIButton *buttonImage = (UIButton *)[cell.contentView viewWithTag:6];
                 UIImage *image = [UIImage imageWithData:picture];
                 buttonImage.contentMode = UIViewContentModeScaleAspectFit;
-                [buttonImage setImage:image forState:UIControlStateNormal];
+                UIImage *scaledImage = [self getScaledImage:image insideButton:buttonImage];
+                [buttonImage setImage:scaledImage forState:UIControlStateNormal];
                 
                 UIImageView *profileImageView = (UIImageView *)[cell.contentView viewWithTag:1];
                 [profileImageView setImage:[UIImage imageWithData:profilePictureData]];
