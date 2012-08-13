@@ -10,6 +10,8 @@
 
 @protocol ImagoDeiTextEntryDelegate <NSObject>
 - (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionaryForComment:(NSDictionary *)dictionary;
+
+- (void)textViewDidCancel:(UITextView *)textView;
 @end
 
 @interface ImagoDeiTextEntryViewController : UIViewController

@@ -529,5 +529,9 @@
     [self.socialMediaDelegate SocialMediaDetailViewController:self postDataForFacebookGraphAPIString:graphAPIString withParameters:[[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil]];
 }
 
+- (void)textViewDidCancel:(UITextView *)textView
+{
+    [self.tableView reloadData];
+}
 
 @end

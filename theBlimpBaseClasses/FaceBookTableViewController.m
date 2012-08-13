@@ -158,7 +158,6 @@
     //Begin the facebook request, the data that comes back form this method will be used
     //to populate the UITableView
     if ([self.facebookArrayTableData count] == 0) [self.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] andDelegate:self];
-    else [self.tableView reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -252,6 +251,11 @@
     NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil];
     
     [self.facebook requestWithGraphPath:graphAPIString andParams:params andHttpMethod:@"POST" andDelegate:self];
+}
+
+- (void)textViewDidCancel:(UITextView *)textView
+{
+    [self.tableView reloadData];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath

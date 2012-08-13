@@ -77,7 +77,9 @@
 
 - (IBAction)cancelButtonPressed:(id)sender 
 {
-    [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+    [[self presentingViewController] dismissViewControllerAnimated:YES completion:^{
+        [self.textEntryDelegate textViewDidCancel:self.textView];
+    }];
 }
 
 - (IBAction)postButtonPushed:(id)sender 
