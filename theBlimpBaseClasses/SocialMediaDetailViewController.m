@@ -191,9 +191,7 @@
     NSString *mainTextLabel = [dictionaryForCell valueForKeyPath:@"message"];
     NSString *detailTextLabel = [dictionaryForCell valueForKeyPath:@"from.name"];
 
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZ"];
-    NSDate *date = [dateFormatter dateFromString:[dictionaryForCell valueForKeyPath:@"created_time"]];
+    NSDate *date = [[NSDate alloc] initFacebookDateFormatWithString:[dictionaryForCell valueForKey:@"created_time"]];
     
     NSNumber *user_likes = [dictionaryForCell valueForKeyPath:@"user_likes"];
     if ([user_likes boolValue])
@@ -291,9 +289,12 @@
     {
         UILabel *name = (UILabel *)[cell.contentView viewWithTag:1];
         UITextView *comment = (UITextView *)[cell.contentView viewWithTag:2];
+        UILabel *dateLabel = (UILabel *)[cell.contentView viewWithTag:4];
         
         NSString *typeOfPost = [self.shortCommentsDictionaryModel valueForKeyPath:@"type"];
         NSString *commentString = [self.shortCommentsDictionaryModel valueForKeyPath:@"message"];
+        NSString *dateString = [self.shortCommentsDictionaryModel valueForKeyPath:@"created_time"];
+        NSDate *date = [[NSDate alloc] initFacebookDateFormatWithString:dateString];
         
         if ([typeOfPost isEqualToString:@"link"])
         {
@@ -311,6 +312,8 @@
         
         name.text = [self.shortCommentsDictionaryModel valueForKeyPath:@"from.name"];
         comment.text = commentString;
+        dateLabel.text = date.socialDate;
+        
         [comment resizeTextViewForWidth:self.tableView.frame.size.width - comment.frame.origin.x - 10];
         dispatch_queue_t downloadQueue = dispatch_queue_create("Profile Image Downloader", NULL);
         dispatch_async(downloadQueue, ^{

@@ -11,6 +11,7 @@
 #import <Twitter/Twitter.h>
 #import "WebViewController.h"
 #import "NSMutableDictionary+appConfiguration.h"
+#import "NSDate+Generic.h"
 
 @interface TwitterTableViewController ()
 @property (nonatomic, strong) NSMutableDictionary *appConfiguration;
@@ -180,12 +181,8 @@
         [tweetText resizeTextViewForWidth:self.tableView.frame.size.width - 30];
     }
     
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"EEE MMM d HH:mm:ss zzzz yyyy"];
-    NSDate *date = [dateFormatter dateFromString:[tweetDictionary valueForKeyPath:TWITTER_POSTED_DATE]];
-    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
-    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
-    postedDate.text = [dateFormatter stringFromDate:date];
+    NSDate *date = [[NSDate alloc] initTwitterDateFormatWithString:[tweetDictionary valueForKeyPath:TWITTER_POSTED_DATE]];
+    postedDate.text = date.socialDate;
     
     return cell;
 }

@@ -12,6 +12,7 @@
 #import "ImageViewController.h"
 #import "UITextView+Facebook.h"
 #import "NSMutableDictionary+appConfiguration.h"
+#import "NSDate+Generic.h"
 
 @interface FaceBookTableViewController ()
 @property (nonatomic, strong) FBRequest *facebookRequest;
@@ -269,6 +270,7 @@
     UIButton *addCommentButton = nil;
     UIImageView *profileImageView = nil;
     UIButton *likeButton = nil;
+    UILabel *datePosted = nil;
     
     if ([typeOfPost isEqualToString:@"photo"])
     {
@@ -300,11 +302,15 @@
         [likeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateDisabled];
         [likeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [likeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateApplication];
+        
+        datePosted = (UILabel *)[cell.contentView viewWithTag:8];
 
     }
     
     //Pull the main and detail text label out of the corresponding dictionary
     NSString *mainTextLabel = [dictionaryForCell valueForKeyPath:[self keyForMainCellLabelText]];
+    NSDate *date = [[NSDate alloc] initFacebookDateFormatWithString:[dictionaryForCell valueForKey:@"created_time"]];
+    datePosted.text = date.socialDate;
     
     if (mainTextLabel == nil)
     {

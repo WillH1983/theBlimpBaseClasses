@@ -53,4 +53,20 @@
     return dateDescription;
 }
 
+- (NSDate *)initFacebookDateFormatWithString:(NSString *)dateString
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZ"];
+    self = [dateFormatter dateFromString:dateString];
+    return self;
+}
+
+- (NSDate *)initTwitterDateFormatWithString:(NSString *)dateString
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"EEE MMM d HH:mm:ss zzzz yyyy"];
+    self = [dateFormatter dateFromString:dateString];
+    return self;
+}
+
 @end

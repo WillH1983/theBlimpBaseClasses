@@ -10,4 +10,8 @@
 
 @interface NSDate (Generic)
 @property (readonly) NSString *socialDate;
+
+- (NSDate *)initFacebookDateFormatWithString:(NSString *)dateString;
+- (NSDate *)initTwitterDateFormatWithString:(NSString *)dateString;
+
 @end
