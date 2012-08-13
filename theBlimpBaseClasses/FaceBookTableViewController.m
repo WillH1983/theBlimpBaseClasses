@@ -17,7 +17,9 @@
 @interface FaceBookTableViewController ()
 @property (nonatomic, strong) FBRequest *facebookRequest;
 @property (nonatomic, strong) NSMutableDictionary *photoDictionary;
-@property(nonatomic, strong) NSMutableDictionary *appConfiguration;
+@property (nonatomic, strong) NSMutableDictionary *appConfiguration;
+@property (nonatomic, strong) UITableViewCell *defaultFacebookCell;
+@property (nonatomic, strong) UITableViewCell *facebookPhotoCell;
 
 - (void)facebookInit;
 @end
@@ -31,11 +33,31 @@
 @synthesize oldBarButtonItem = _oldBarButtonItem;
 @synthesize userNameID = _userNameID;
 @synthesize appConfiguration = _appConfiguration;
+@synthesize defaultFacebookCell = _defaultFacebookCell;
+@synthesize facebookPhotoCell = _facebookPhotoCell;
 
 - (NSMutableDictionary *)photoDictionary
 {
     if (_photoDictionary == nil) _photoDictionary = [[NSMutableDictionary alloc] init];
     return _photoDictionary;
+}
+
+- (UITableViewCell *)defaultFacebookCell
+{
+    if (_defaultFacebookCell == nil)
+    {
+        _defaultFacebookCell = [self.tableView dequeueReusableCellWithIdentifier:@"defaultFacebookCell"];
+    }
+    return _defaultFacebookCell;
+}
+
+- (UITableViewCell *)facebookPhotoCell
+{
+    if (_facebookPhotoCell == nil)
+    {
+        _facebookPhotoCell = [self.tableView dequeueReusableCellWithIdentifier:@"photoFacebookCell"];
+    }
+    return _facebookPhotoCell;
 }
 
 - (void)setFacebookArrayTableData:(NSArray *)facebookArrayTableData
@@ -494,35 +516,35 @@
         }
     }
     
-    UITableViewCell *cell = nil;
-    
+    CGFloat height = CGFLOAT_MIN;
     if ([typeOfPost isEqualToString:@"photo"])
     {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"photoFacebookCell"];
-        cell.frame = CGRectMake(cell.frame.origin.x, cell.frame.origin.y, cell.frame.size.width, 303);
-        UITextView *textView2 = (UITextView *)[cell.contentView viewWithTag:3];
+        UITextView *textView2 = (UITextView *)[self.facebookPhotoCell.contentView viewWithTag:3];
         textView2.frame = CGRectMake(textView2.frame.origin.x, textView2.frame.origin.y, textView2.frame.size.width, 25);
-    }
-    else
-    {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"defaultFacebookCell"];
-        cell.frame = CGRectMake(cell.frame.origin.x, cell.frame.origin.y, cell.frame.size.width, 128);
-        UITextView *textView2 = (UITextView *)[cell.contentView viewWithTag:3];
-        textView2.frame = CGRectMake(textView2.frame.origin.x, textView2.frame.origin.y, textView2.frame.size.width, 25);
-    }
-    
-    CGFloat height = 42;
-    if (cell)
-    {
         //Set the cell text label's based upon the table contents array location
-        UITextView *textView = (UITextView *)[cell.contentView viewWithTag:3];
+        UITextView *textView = (UITextView *)[self.facebookPhotoCell.contentView viewWithTag:3];
         textView.text = mainTextLabel;
         CGFloat oldSizeHeight = textView.frame.size.height;
         [textView resizeTextViewForWidth:self.tableView.frame.size.width - 20];
         
         CGFloat heightChange = textView.frame.size.height - oldSizeHeight;
-        height = cell.frame.size.height + heightChange;
+        height = self.facebookPhotoCell.frame.size.height + heightChange;
     }
+    else
+    {
+        UITextView *textView2 = (UITextView *)[self.defaultFacebookCell.contentView viewWithTag:3];
+        textView2.frame = CGRectMake(textView2.frame.origin.x, textView2.frame.origin.y, textView2.frame.size.width, 25);
+        //Set the cell text label's based upon the table contents array location
+        UITextView *textView = (UITextView *)[self.defaultFacebookCell.contentView viewWithTag:3];
+        textView.text = mainTextLabel;
+        CGFloat oldSizeHeight = textView.frame.size.height;
+        [textView resizeTextViewForWidth:self.tableView.frame.size.width - 20];
+        
+        CGFloat heightChange = textView.frame.size.height - oldSizeHeight;
+        height = self.defaultFacebookCell.frame.size.height + heightChange;
+    }
+    
+    
     return height;
 }
 
