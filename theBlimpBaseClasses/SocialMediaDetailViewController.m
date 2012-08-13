@@ -10,6 +10,7 @@
 #import "ImageViewController.h"
 #import "WebViewController.h"
 #import "UITextView+Facebook.h"
+#import "NSDate+Generic.h"
 
 @interface SocialMediaDetailViewController ()
 @property (nonatomic, strong) NSArray *commentsArray;
@@ -165,6 +166,7 @@
     UILabel *name = nil;
     UITextView *comment = nil;
     UIButton *likeButton = nil;
+    UILabel *datePosted = nil;
     
     //If there is no reusable cell of this type, create a new one
     if (!cell)
@@ -179,6 +181,8 @@
     likeButton = (UIButton *)[cell.contentView viewWithTag:4];
     [likeButton addTarget:self action:@selector(likeButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
+    datePosted = (UILabel *)[cell.contentView viewWithTag:5];
+    
     profileImageView.image = nil;
     
     //Retrieve the corresponding dictionary for the cell, retrieve the main and detail text
@@ -186,6 +190,10 @@
     NSDictionary *dictionaryForCell = [self.commentsArray objectAtIndex:[indexPath row]];
     NSString *mainTextLabel = [dictionaryForCell valueForKeyPath:@"message"];
     NSString *detailTextLabel = [dictionaryForCell valueForKeyPath:@"from.name"];
+
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZ"];
+    NSDate *date = [dateFormatter dateFromString:[dictionaryForCell valueForKeyPath:@"created_time"]];
     
     NSNumber *user_likes = [dictionaryForCell valueForKeyPath:@"user_likes"];
     if ([user_likes boolValue])
@@ -200,11 +208,13 @@
     
     comment.text = mainTextLabel;
     name.text = detailTextLabel;
+    datePosted.text = date.socialDate;
     
     [comment resizeTextViewForWidth:self.tableView.frame.size.width - comment.frame.origin.x - 30];
     CGFloat heightChange = comment.frame.size.height - oldSizeHeight;
     
     likeButton.frame = CGRectMake(likeButton.frame.origin.x, likeButton.frame.origin.y + heightChange, likeButton.frame.size.width, likeButton.frame.size.height);
+    datePosted.frame = CGRectMake(datePosted.frame.origin.x, datePosted.frame.origin.y + heightChange, datePosted.frame.size.width, datePosted.frame.size.height);
     
     return cell;
     
