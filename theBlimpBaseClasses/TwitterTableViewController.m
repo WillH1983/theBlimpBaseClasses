@@ -183,29 +183,28 @@
 {
     static NSString *CellIdentifier = @"twitterCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    NSLog(@"%f -- CELL HEIGHT", cell.frame.size.height);
     
     UILabel *postedBy = (UILabel *)[cell.contentView viewWithTag:2];
     UITextView *tweetText = (UITextView *)[cell.contentView viewWithTag:3];
     UILabel *twitterScreenName = (UILabel *)[cell.contentView viewWithTag:4];
     UILabel *postedDate = (UILabel *)[cell.contentView viewWithTag:5];
+    UIButton *retweetButton = (UIButton *)[cell.contentView viewWithTag:6];
+    [retweetButton addTarget:self action:@selector(retweetButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     NSDictionary *tweetDictionary = [self.twitterTableData objectAtIndex:indexPath.row];
     
     postedBy.text = [tweetDictionary valueForKeyPath:TWITTER_NAME];
-    NSString *screeName = [tweetDictionary valueForKeyPath:TWITTER_SCREEN_NAME];
-    twitterScreenName.text = [NSString stringWithFormat:@"@%@", screeName];
+    NSString *screenName = [tweetDictionary valueForKeyPath:TWITTER_SCREEN_NAME];
+    twitterScreenName.text = [NSString stringWithFormat:@"@%@", screenName];
     
+    CGFloat oldHeight = tweetText.frame.size.height;
     tweetText.text = [tweetDictionary valueForKeyPath:TWITTER_TWEET];
-    
-    if(self.interfaceOrientation == UIInterfaceOrientationLandscapeLeft || self.interfaceOrientation == UIInterfaceOrientationLandscapeRight)
-    {
-        [tweetText resizeTextViewForWidth:self.tableView.frame.size.width - 30];
-    }
-    else
-    {
-        [tweetText resizeTextViewForWidth:self.tableView.frame.size.width - 30];
-    }
-    
+    [tweetText resizeTextViewForWidth:self.tableView.frame.size.width - 30];
+    CGFloat heightChange = tweetText.frame.size.height - oldHeight;
+    NSLog(@"%f -- HEIGHT CHANGE", heightChange);
+
+    retweetButton.frame = CGRectMake(retweetButton.frame.origin.x, retweetButton.frame.origin.y + heightChange, retweetButton.frame.size.width, retweetButton.frame.size.height);
     NSDate *date = [[NSDate alloc] initTwitterDateFormatWithString:[tweetDictionary valueForKeyPath:TWITTER_POSTED_DATE]];
     postedDate.text = date.socialDate;
     
@@ -221,9 +220,11 @@
     
     NSDictionary *tweetDictionary = [self.twitterTableData objectAtIndex:indexPath.row];
     tweetText.text = [tweetDictionary valueForKeyPath:TWITTER_TWEET];
+    CGFloat oldHeight = tweetText.frame.size.height;
     [tweetText resizeTextViewForWidth:self.tableView.frame.size.width - 30];
+    CGFloat heightChange = tweetText.frame.size.height - oldHeight;
 
-    CGFloat height = tweetText.frame.origin.y + tweetText.frame.size.height;
+    CGFloat height = cell.frame.size.height + heightChange;
     
     return height;
 }
