@@ -18,5 +18,6 @@
 #define TWITTER_PROFILE_IMAGE @"user.profile_image_url"
 #define TWITTER_SCREEN_NAME @"user.screen_name"
 #define TWITTER_POSTED_DATE @"created_at"
+#define TWITTER_POST_ID @"id_str"
 
 @end
