@@ -19,5 +19,6 @@
 #define TWITTER_SCREEN_NAME @"user.screen_name"
 #define TWITTER_POSTED_DATE @"created_at"
 #define TWITTER_POST_ID @"id_str"
+#define TWEET_RETWEETED @"retweeted"
 
 @end
