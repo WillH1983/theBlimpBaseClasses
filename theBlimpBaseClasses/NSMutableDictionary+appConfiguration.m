@@ -59,4 +59,15 @@
 {
     return [self objectForKey:@"facebookFeedToRequest"];
 }
+
+- (void)setTwitterUserNameToRequest:(NSString *)twitterUserNameToRequest
+{
+    [self setObject:twitterUserNameToRequest forKey:@"twitterUserNameToRequest"];
+}
+
+- (NSString *)twitterUserNameToRequest
+{
+    return [self objectForKey:@"twitterUserNameToRequest"];
+}
+
 @end

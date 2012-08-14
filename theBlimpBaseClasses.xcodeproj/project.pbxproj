@@ -9,8 +9,9 @@
 /* Begin PBXBuildFile section */
 		BE26015715D893C1000F720D /* NSDate+Generic.h in Headers */ = {isa = PBXBuildFile; fileRef = BE26015515D893C1000F720D /* NSDate+Generic.h */; };
 		BE26015815D893C1000F720D /* NSDate+Generic.m in Sources */ = {isa = PBXBuildFile; fileRef = BE26015615D893C1000F720D /* NSDate+Generic.m */; };
+		BEEB0AB515D9E7CE0026DD5E /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEEB0AB415D9E7CE0026DD5E /* Twitter.framework */; };
+		BEEB0AB715D9E85B0026DD5E /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEEB0AB615D9E85B0026DD5E /* Accounts.framework */; };
 		BEF4248415D6E2DF00C647BC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4248315D6E2DF00C647BC /* Foundation.framework */; };
-		BEF4248A15D6E2DF00C647BC /* theBlimpBaseClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = BEF4248915D6E2DF00C647BC /* theBlimpBaseClasses.m */; };
 		BEF4249215D6E2DF00C647BC /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4249115D6E2DF00C647BC /* SenTestingKit.framework */; };
 		BEF4249415D6E2DF00C647BC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4249315D6E2DF00C647BC /* UIKit.framework */; };
 		BEF4249515D6E2DF00C647BC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4248315D6E2DF00C647BC /* Foundation.framework */; };
@@ -54,7 +55,6 @@
 		BEF424F315D6E35500C647BC /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BEF424CE15D6E35500C647BC /* WebViewController.m */; };
 		BEF424F415D6E35500C647BC /* XMLReader.h in Headers */ = {isa = PBXBuildFile; fileRef = BEF424CF15D6E35500C647BC /* XMLReader.h */; settings = {ATTRIBUTES = (); }; };
 		BEF424F515D6E35500C647BC /* XMLReader.m in Sources */ = {isa = PBXBuildFile; fileRef = BEF424D015D6E35500C647BC /* XMLReader.m */; };
-		BEF424F815D6E36300C647BC /* theBlimpBaseClasses.h in Headers */ = {isa = PBXBuildFile; fileRef = BEF424F615D6E36300C647BC /* theBlimpBaseClasses.h */; settings = {ATTRIBUTES = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,11 +70,13 @@
 /* Begin PBXFileReference section */
 		BE26015515D893C1000F720D /* NSDate+Generic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Generic.h"; sourceTree = "<group>"; };
 		BE26015615D893C1000F720D /* NSDate+Generic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Generic.m"; sourceTree = "<group>"; };
+		BEEB0AB115D9CD760026DD5E /* 112-group.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "112-group.png"; sourceTree = "<group>"; };
+		BEEB0AB215D9CD760026DD5E /* f_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = f_logo.png; sourceTree = "<group>"; };
+		BEEB0AB415D9E7CE0026DD5E /* Twitter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Twitter.framework; path = System/Library/Frameworks/Twitter.framework; sourceTree = SDKROOT; };
+		BEEB0AB615D9E85B0026DD5E /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
 		BEF4248015D6E2DF00C647BC /* libtheBlimpBaseClasses.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtheBlimpBaseClasses.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEF4248315D6E2DF00C647BC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BEF4248715D6E2DF00C647BC /* theBlimpBaseClasses-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "theBlimpBaseClasses-Prefix.pch"; sourceTree = "<group>"; };
-		BEF4248815D6E2DF00C647BC /* theBlimpBaseClasses.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = theBlimpBaseClasses.h; sourceTree = "<group>"; };
-		BEF4248915D6E2DF00C647BC /* theBlimpBaseClasses.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = theBlimpBaseClasses.m; sourceTree = "<group>"; };
 		BEF4249015D6E2DF00C647BC /* theBlimpBaseClassesTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = theBlimpBaseClassesTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEF4249115D6E2DF00C647BC /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		BEF4249315D6E2DF00C647BC /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -121,8 +123,6 @@
 		BEF424CE15D6E35500C647BC /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
 		BEF424CF15D6E35500C647BC /* XMLReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLReader.h; sourceTree = "<group>"; };
 		BEF424D015D6E35500C647BC /* XMLReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLReader.m; sourceTree = "<group>"; };
-		BEF424F615D6E36300C647BC /* theBlimpBaseClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = theBlimpBaseClasses.h; sourceTree = "<group>"; };
-		BEF424F715D6E36300C647BC /* theBlimpBaseClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = theBlimpBaseClasses.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +130,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEEB0AB715D9E85B0026DD5E /* Accounts.framework in Frameworks */,
+				BEEB0AB515D9E7CE0026DD5E /* Twitter.framework in Frameworks */,
 				BEF4248415D6E2DF00C647BC /* Foundation.framework in Frameworks */,
 				BEF424DE15D6E35500C647BC /* libfacebook_ios_sdk.a in Frameworks */,
 			);
@@ -167,6 +169,8 @@
 		BE26015415D892E8000F720D /* Facebook */ = {
 			isa = PBXGroup;
 			children = (
+				BEEB0AB115D9CD760026DD5E /* 112-group.png */,
+				BEEB0AB215D9CD760026DD5E /* f_logo.png */,
 				BEF424AA15D6E35500C647BC /* Facebook.h */,
 				BEF424AB15D6E35500C647BC /* FacebookButton@2x.png */,
 				BEF424AE15D6E35500C647BC /* FBConnect.h */,
@@ -209,6 +213,8 @@
 		BEF4248215D6E2DF00C647BC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BEEB0AB615D9E85B0026DD5E /* Accounts.framework */,
+				BEEB0AB415D9E7CE0026DD5E /* Twitter.framework */,
 				BEF4248315D6E2DF00C647BC /* Foundation.framework */,
 				BEF4249115D6E2DF00C647BC /* SenTestingKit.framework */,
 				BEF4249315D6E2DF00C647BC /* UIKit.framework */,
@@ -221,10 +227,6 @@
 			children = (
 				BE26015415D892E8000F720D /* Facebook */,
 				BE26015215D892B9000F720D /* Categories */,
-				BEF4248815D6E2DF00C647BC /* theBlimpBaseClasses.h */,
-				BEF4248915D6E2DF00C647BC /* theBlimpBaseClasses.m */,
-				BEF424F615D6E36300C647BC /* theBlimpBaseClasses.h */,
-				BEF424F715D6E36300C647BC /* theBlimpBaseClasses.m */,
 				BEF424AC15D6E35500C647BC /* FaceBookTableViewController.h */,
 				BEF424AD15D6E35500C647BC /* FaceBookTableViewController.m */,
 				BEF424B415D6E35500C647BC /* ImageViewController.h */,
@@ -307,7 +309,6 @@
 				BEF424F015D6E35500C647BC /* UITextView+Facebook.h in Headers */,
 				BEF424F215D6E35500C647BC /* WebViewController.h in Headers */,
 				BEF424F415D6E35500C647BC /* XMLReader.h in Headers */,
-				BEF424F815D6E36300C647BC /* theBlimpBaseClasses.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,7 +409,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BEF4248A15D6E2DF00C647BC /* theBlimpBaseClasses.m in Sources */,
 				BEF424D315D6E35500C647BC /* FaceBookTableViewController.m in Sources */,
 				BEF424DA15D6E35500C647BC /* ImageViewController.m in Sources */,
 				BEF424DC15D6E35500C647BC /* ImagoDeiTextEntryViewController.m in Sources */,

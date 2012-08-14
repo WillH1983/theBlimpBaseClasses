@@ -9,6 +9,7 @@
 #import "TwitterTableViewController.h"
 #import "UITextView+Facebook.h"
 #import <Twitter/Twitter.h>
+#import <Accounts/Accounts.h>
 #import "WebViewController.h"
 #import "NSMutableDictionary+appConfiguration.h"
 #import "NSDate+Generic.h"
@@ -76,7 +77,7 @@
     
     //  First, we create a dictionary to hold our request parameters
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-    [params setObject:@"techpoweredmath" forKey:@"screen_name"];
+    [params setObject:self.appConfiguration.twitterUserNameToRequest forKey:@"screen_name"];
     [params setObject:@"20" forKey:@"count"];
     [params setObject:@"1" forKey:@"include_rts"];
     
@@ -89,43 +90,67 @@
                                              parameters:params 
                                           requestMethod:TWRequestMethodGET];
     
-    //  Perform our request
-    [request performRequestWithHandler:
-     ^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
-         
-         if (responseData) {
-             //  Use the NSJSONSerialization class to parse the returned JSON
-             NSError *jsonError;
-             NSArray *timeline = 
-             [NSJSONSerialization JSONObjectWithData:responseData 
-                                             options:NSJSONReadingMutableLeaves 
-                                               error:&jsonError];
-             
-             if (timeline) {
-                 // We have an object that we can parse
-                 NSLog(@"%@", timeline);
-                 if ([timeline isKindOfClass:[NSArray class]])
-                 {
-                     self.twitterTableData = timeline;
-                 }
-                 dispatch_async(dispatch_get_main_queue(), ^{
-                     if ([timeline isKindOfClass:[NSDictionary class]])
-                     {
-                         if ([timeline valueForKey:@"error"])
+    //  First, we need to obtain the account instance for the user's Twitter account
+    ACAccountStore *store = [[ACAccountStore alloc] init];
+    ACAccountType *twitterAccountType = [store accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
+    
+    //  Request permission from the user to access the available Twitter accounts
+    [store requestAccessToAccountsWithType:twitterAccountType 
+                     withCompletionHandler:^(BOOL granted, NSError *error) {
+                         if (!granted) 
                          {
-                             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ - Twitter", self.appConfiguration.appName] message:[timeline valueForKey:@"error"] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
-                             [alertView show];
+                             // The user rejected your request 
+                             NSLog(@"User rejected access to the account.");
+                         } 
+                         else 
+                         {
+                             // Grab the available accounts
+                             NSArray *twitterAccounts = [store accountsWithAccountType:twitterAccountType];
+                             if ([twitterAccounts count] > 0) 
+                             {
+                                 ACAccount *account = [twitterAccounts objectAtIndex:0];
+                                 request.account = account;
+                                 
+                                 //  Perform our request
+                                 [request performRequestWithHandler:
+                                  ^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+                                      
+                                      if (responseData) {
+                                          //  Use the NSJSONSerialization class to parse the returned JSON
+                                          NSError *jsonError;
+                                          NSArray *timeline = 
+                                          [NSJSONSerialization JSONObjectWithData:responseData 
+                                                                          options:NSJSONReadingMutableLeaves 
+                                                                            error:&jsonError];
+                                          
+                                          if (timeline) {
+                                              // We have an object that we can parse
+                                              NSLog(@"%@", timeline);
+                                              if ([timeline isKindOfClass:[NSArray class]])
+                                              {
+                                                  self.twitterTableData = timeline;
+                                              }
+                                              dispatch_async(dispatch_get_main_queue(), ^{
+                                                  if ([timeline isKindOfClass:[NSDictionary class]])
+                                                  {
+                                                      if ([timeline valueForKey:@"error"])
+                                                      {
+                                                          UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ - Twitter", self.appConfiguration.appName] message:[timeline valueForKey:@"error"] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+                                                          [alertView show];
+                                                      }
+                                                  }
+                                                  [self.activityIndicator stopAnimating];
+                                              });
+                                          } 
+                                          else { 
+                                              // Inspect the contents of jsonError
+                                              NSLog(@"%@", jsonError);
+                                          }
+                                      }
+                                  }]; 
+                             }
                          }
-                     }
-                     [self.activityIndicator stopAnimating];
-                 });
-             } 
-             else { 
-                 // Inspect the contents of jsonError
-                 NSLog(@"%@", jsonError);
-             }
-         }
-     }];
+                     }];
 }
 
 - (void)viewDidUnload
