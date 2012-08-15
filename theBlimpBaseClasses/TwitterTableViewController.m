@@ -16,6 +16,7 @@
 
 @interface TwitterTableViewController ()
 @property (nonatomic, strong) NSMutableDictionary *appConfiguration;
+@property (nonatomic, strong) UITableViewCell *twitterCell;
 
 - (void)retweetButtonPressed:(id)sender;
 @end
@@ -24,11 +25,18 @@
 @synthesize twitterTableData = _twitterTableData;
 @synthesize activityIndicator = _activityIndicator;
 @synthesize appConfiguration = _appConfiguration;
+@synthesize twitterCell = _twitterCell;
 
 - (NSArray *)twitterTableData
 {
     if (!_twitterTableData) _twitterTableData = [[NSArray alloc] init];
     return _twitterTableData;
+}
+
+- (UITableViewCell *)twitterCell
+{
+    if (!_twitterCell) _twitterCell = [self.tableView dequeueReusableCellWithIdentifier:@"twitterCell"];
+    return _twitterCell;
 }
 
 - (void)setTwitterTableData:(NSArray *)twitterTableData
@@ -258,18 +266,19 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"twitterCell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
-    UITextView *tweetText = (UITextView *)[cell.contentView viewWithTag:3];
+    UITextView *tweetText = (UITextView *)[self.twitterCell.contentView viewWithTag:3];
+    tweetText.frame = CGRectMake(tweetText.frame.origin.x, tweetText.frame.origin.y, tweetText.frame.size.width, 25);
+    //Set the cell text label's based upon the table contents array location
+    UITextView *tweetText2 = (UITextView *)[self.twitterCell.contentView viewWithTag:3];
     
     NSDictionary *tweetDictionary = [self.twitterTableData objectAtIndex:indexPath.row];
-    tweetText.text = [tweetDictionary valueForKeyPath:TWITTER_TWEET];
+    tweetText2.text = [tweetDictionary valueForKeyPath:TWITTER_TWEET];
     CGFloat oldHeight = tweetText.frame.size.height;
     [tweetText resizeTextViewForWidth:self.tableView.frame.size.width - 30];
     CGFloat heightChange = tweetText.frame.size.height - oldHeight;
 
-    CGFloat height = cell.frame.size.height + heightChange;
+    CGFloat height = self.twitterCell.frame.size.height + heightChange;
     
     return height;
 }
