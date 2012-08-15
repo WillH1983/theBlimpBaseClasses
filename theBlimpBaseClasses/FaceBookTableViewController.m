@@ -338,15 +338,20 @@
     NSDate *date = [[NSDate alloc] initFacebookDateFormatWithString:[dictionaryForCell valueForKey:@"created_time"]];
     datePosted.text = date.socialDate;
     
-    if (mainTextLabel == nil)
-    {
-        mainTextLabel = [dictionaryForCell valueForKeyPath:[self keyForDetailCellLabelText]];
-    }
-    
     if ([typeOfPost isEqualToString:@"link"])
     {
         NSRange range = [mainTextLabel rangeOfString:@"http"];
-        if (range.location == NSNotFound)
+        if (mainTextLabel == nil)
+        {
+            mainTextLabel = [NSString stringWithFormat:@"%@ - %@", [dictionaryForCell valueForKey:@"name"],[dictionaryForCell valueForKey:@"description"]];
+            NSString *linkURL = [dictionaryForCell valueForKeyPath:@"link"];
+            if ([linkURL isKindOfClass:[NSString class]])
+            {
+                mainTextLabel = [mainTextLabel stringByAppendingString:@" "];
+                mainTextLabel = [mainTextLabel stringByAppendingString:linkURL];
+            }
+        }
+        else if (range.location == NSNotFound)
         {
             NSString *linkURL = [dictionaryForCell valueForKeyPath:@"link"];
             if ([linkURL isKindOfClass:[NSString class]])
@@ -354,6 +359,13 @@
                 mainTextLabel = [mainTextLabel stringByAppendingString:@" "];
                 mainTextLabel = [mainTextLabel stringByAppendingString:linkURL];
             }
+        }
+    }
+    else if (mainTextLabel == nil)
+    {
+        if ([dictionaryForCell valueForKey:@"story"])
+        {
+            mainTextLabel = [dictionaryForCell valueForKey:@"story"];
         }
     }
     
@@ -496,7 +508,6 @@
     NSString *mainTextLabel = [dictionaryForCell valueForKey:[self keyForMainCellLabelText]];
     
     NSString *typeOfPost = [dictionaryForCell valueForKeyPath:@"type"];
-    
     if (mainTextLabel == nil)
     {
         mainTextLabel = [dictionaryForCell valueForKeyPath:[self keyForDetailCellLabelText]];
@@ -505,7 +516,17 @@
     if ([typeOfPost isEqualToString:@"link"])
     {
         NSRange range = [mainTextLabel rangeOfString:@"http"];
-        if (range.location == NSNotFound)
+        if (mainTextLabel == nil)
+        {
+            mainTextLabel = [NSString stringWithFormat:@"%@ - %@", [dictionaryForCell valueForKey:@"name"],[dictionaryForCell valueForKey:@"description"]];
+            NSString *linkURL = [dictionaryForCell valueForKeyPath:@"link"];
+            if ([linkURL isKindOfClass:[NSString class]])
+            {
+                mainTextLabel = [mainTextLabel stringByAppendingString:@" "];
+                mainTextLabel = [mainTextLabel stringByAppendingString:linkURL];
+            }
+        }
+        else if (range.location == NSNotFound)
         {
             NSString *linkURL = [dictionaryForCell valueForKeyPath:@"link"];
             if ([linkURL isKindOfClass:[NSString class]])
@@ -513,6 +534,13 @@
                 mainTextLabel = [mainTextLabel stringByAppendingString:@" "];
                 mainTextLabel = [mainTextLabel stringByAppendingString:linkURL];
             }
+        }
+    }
+    else if (mainTextLabel == nil)
+    {
+        if ([dictionaryForCell valueForKey:@"story"])
+        {
+            mainTextLabel = [dictionaryForCell valueForKey:@"story"];
         }
     }
     
