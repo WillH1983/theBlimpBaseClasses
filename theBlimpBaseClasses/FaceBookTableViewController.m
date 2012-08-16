@@ -107,7 +107,6 @@
 
 - (void)commonInit
 {
-    self.tabBarItem.title = @"Facebook";
     self.tableView.allowsSelection = NO;
 }
 
