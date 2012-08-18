@@ -10,7 +10,7 @@
 
 @interface TwitterTableViewController : UITableViewController
 
-@property (nonatomic, strong) NSArray *twitterTableData;
+@property (nonatomic, strong) NSMutableArray *twitterTableData;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
 
 #define TWITTER_TWEET @"text"
@@ -20,5 +20,6 @@
 #define TWITTER_POSTED_DATE @"created_at"
 #define TWITTER_POST_ID @"id_str"
 #define TWEET_RETWEETED @"retweeted"
+#define USER_RETWEETED_ID @"current_user_retweet.id_str"
 
 @end

@@ -14,11 +14,22 @@
 #import "NSMutableDictionary+appConfiguration.h"
 #import "NSDate+Generic.h"
 
-@interface TwitterTableViewController ()
+enum TWRequestType {
+    TWRequestTypeRetweet,
+    TWRequestTypeRemoveRetweet,
+    TWRequestTypeGetTimeline
+};
+
+typedef enum TWRequestType TWRequestType;
+
+@interface TwitterTableViewController () <UIActionSheetDelegate>
 @property (nonatomic, strong) NSMutableDictionary *appConfiguration;
 @property (nonatomic, strong) UITableViewCell *twitterCell;
+@property (nonatomic, strong) NSDictionary *tweetToRetweet;
+@property (nonatomic, strong) ACAccount *twitterAccount;
 
 - (void)retweetButtonPressed:(id)sender;
+
 @end
 
 @implementation TwitterTableViewController
@@ -26,10 +37,12 @@
 @synthesize activityIndicator = _activityIndicator;
 @synthesize appConfiguration = _appConfiguration;
 @synthesize twitterCell = _twitterCell;
+@synthesize tweetToRetweet = _tweetToRetweet;
+@synthesize twitterAccount = _twitterAccount;
 
-- (NSArray *)twitterTableData
+- (NSMutableArray *)twitterTableData
 {
-    if (!_twitterTableData) _twitterTableData = [[NSArray alloc] init];
+    if (!_twitterTableData) _twitterTableData = [[NSMutableArray alloc] init];
     return _twitterTableData;
 }
 
@@ -39,7 +52,7 @@
     return _twitterCell;
 }
 
-- (void)setTwitterTableData:(NSArray *)twitterTableData
+- (void)setTwitterTableData:(NSMutableArray *)twitterTableData
 {
     _twitterTableData = twitterTableData;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -64,6 +77,28 @@
                                              selector:@selector(presentWebView:) 
                                                  name:@"urlSelected"
                                                object:nil];
+    
+    ACAccountStore *store = [[ACAccountStore alloc] init];
+    ACAccountType *twitterAccountType = [store accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
+    
+    //  Request permission from the user to access the available Twitter accounts
+    [store requestAccessToAccountsWithType:twitterAccountType withCompletionHandler:^(BOOL granted, NSError *error) {
+        if (!granted) 
+        {
+            // The user rejected your request 
+            NSLog(@"User rejected access to the account.");
+        } 
+        else 
+        {
+            NSArray *twitterAccounts = [store accountsWithAccountType:twitterAccountType];
+            if ([twitterAccounts count] > 0)
+            {
+                self.twitterAccount = [twitterAccounts objectAtIndex:0];
+                [self loadTwitterData];
+            }
+            
+        }
+    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -75,10 +110,12 @@
 
 - (void)loadTwitterData
 {
-    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    self.activityIndicator.hidesWhenStopped = YES;
-    [self.activityIndicator startAnimating];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        self.activityIndicator.hidesWhenStopped = YES;
+        [self.activityIndicator startAnimating];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    });
     
     //  First, we create a dictionary to hold our request parameters
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
@@ -89,7 +126,7 @@
     //  Next, we create an URL that points to the target endpoint
     NSURL *url = [NSURL URLWithString:@"http://api.twitter.com/1/statuses/user_timeline.json"];
     
-    [self twitterRequestWithURL:url twitterParameters:params twitterRequestMethod:TWRequestMethodGET];
+    [self twitterGetRequestWithURL:url twitterParameters:params withRequestType:TWRequestTypeGetTimeline];
 }
 
 - (void)viewDidLoad
@@ -98,7 +135,7 @@
     
     id appDelegate = (id)[[UIApplication sharedApplication] delegate];
     self.appConfiguration = [appDelegate appConfiguration];
-    [self loadTwitterData];
+    
     
 }
 
@@ -128,74 +165,162 @@
     return [self.twitterTableData count];
 }
 
-- (void)twitterRequestWithURL:(NSURL *)url twitterParameters:(NSMutableDictionary*)parms twitterRequestMethod:(TWRequestMethod)requestMethod
+- (void)twitterPostRequestWithURL:(NSURL *)url twitterParameters:(NSMutableDictionary *)parms withRequestType:(TWRequestType)requestType
+{
+    
+    TWRequest *request = [[TWRequest alloc] initWithURL:url
+                                             parameters:parms
+                                          requestMethod:TWRequestMethodPOST];
+    
+    ACAccountStore *store = [[ACAccountStore alloc] init];
+    ACAccountType *twitterAccountType = [store accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
+    if (twitterAccountType.accessGranted) 
+    {
+        NSArray *twitterAccounts = [store accountsWithAccountType:twitterAccountType];
+        request.account = [twitterAccounts objectAtIndex:0];
+    }
+    else return;
+    
+                
+    //  Perform our request
+    [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+    NSError *jsonError;
+    NSArray *timeline = [NSJSONSerialization JSONObjectWithData:responseData 
+                                                        options:NSJSONReadingMutableLeaves 
+                                                          error:&jsonError];
+    
+    if (timeline) 
+    {
+        // We have an object that we can parse
+        if ([timeline valueForKey:@"error"])
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ - Twitter", self.appConfiguration.appName] 
+                                                                    message:[timeline valueForKey:@"error"] 
+                                                                    delegate:nil 
+                                                            cancelButtonTitle:@"Okay" 
+                                                            otherButtonTitles: nil];
+                [alertView show];
+            });
+        }
+        else 
+        {
+            if (requestType == TWRequestTypeRetweet)
+            {
+                id retweetedID = [timeline valueForKeyPath:@"retweeted_status.id"];
+                if ([retweetedID isKindOfClass:[NSNumber class]])
+                {
+                    for (int i = 0; i < [self.twitterTableData count]; i++)
+                    {
+                        NSDictionary *items = [self.twitterTableData objectAtIndex:i];
+                        if ([[items valueForKey:@"id"] isEqualToNumber:retweetedID])
+                        {
+                            NSMutableDictionary *mutableItems = [items mutableCopy];
+                            [mutableItems setValue:[NSNumber numberWithInt:1] forKey:TWEET_RETWEETED];
+                            [self.twitterTableData replaceObjectAtIndex:i withObject:[mutableItems copy]];
+                        }
+                    }
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.tableView reloadData];
+                        [self.activityIndicator stopAnimating];
+                    });
+                }
+            }
+            else if (requestType == TWRequestTypeRemoveRetweet)
+            {
+                id retweetedID = [timeline valueForKeyPath:@"retweeted_status.id"];
+                NSLog(@"%@", retweetedID);
+                if ([retweetedID isKindOfClass:[NSNumber class]])
+                {
+                    for (int i = 0; i < [self.twitterTableData count]; i++)
+                    {
+                        NSDictionary *items = [self.twitterTableData objectAtIndex:i];
+                        if ([[items valueForKey:@"id"] isEqualToNumber:retweetedID])
+                        {
+                            NSMutableDictionary *mutableItems = [items mutableCopy];
+                            [mutableItems setValue:[NSNumber numberWithInt:0] forKey:TWEET_RETWEETED];
+                            [self.twitterTableData replaceObjectAtIndex:i withObject:[mutableItems copy]];
+                        }
+                    }
+                }
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.tableView reloadData];
+                    [self.activityIndicator stopAnimating];
+                });
+            }
+        }
+    } 
+    else 
+    { 
+        // Inspect the contents of jsonError
+        NSLog(@"%@", jsonError);
+    }
+}]; 
+}
+
+- (void)twitterGetRequestWithURL:(NSURL *)url twitterParameters:(NSMutableDictionary *)parms withRequestType:(TWRequestType)requestType
 {
     //  Now we can create our request.  Note that we are performing a GET request.
     TWRequest *request = [[TWRequest alloc] initWithURL:url 
                                              parameters:parms 
-                                          requestMethod:requestMethod];
+                                          requestMethod:TWRequestMethodGET];
     
-    //  First, we need to obtain the account instance for the user's Twitter account
     ACAccountStore *store = [[ACAccountStore alloc] init];
     ACAccountType *twitterAccountType = [store accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
-    
-    //  Request permission from the user to access the available Twitter accounts
-    [store requestAccessToAccountsWithType:twitterAccountType withCompletionHandler:^(BOOL granted, NSError *error) {
-        if (!granted) 
+    if (twitterAccountType.accessGranted) 
+    {
+        NSArray *twitterAccounts = [store accountsWithAccountType:twitterAccountType];
+        request.account = [twitterAccounts objectAtIndex:0];
+    }
+    else return;
+                
+    //  Perform our request
+    [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+        //  Use the NSJSONSerialization class to parse the returned JSON
+        NSError *jsonError;
+        id timeline = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:&jsonError];
+        
+        if (timeline) 
         {
-            // The user rejected your request 
-            NSLog(@"User rejected access to the account.");
+            // We have an object that we can parse
+            if ([timeline valueForKey:@"error"] != nil && [timeline isKindOfClass:[NSDictionary class]])
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ - Twitter", self.appConfiguration.appName] 
+                                                                        message:[timeline valueForKey:@"error"] 
+                                                                       delegate:nil 
+                                                              cancelButtonTitle:@"Okay" 
+                                                              otherButtonTitles: nil];
+                    [alertView show];
+                });
+            }
+            else if (requestType == TWRequestTypeGetTimeline)
+            {
+                if ([timeline isKindOfClass:[NSArray class]])
+                {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self.twitterTableData = [timeline mutableCopy];
+                        [self.activityIndicator stopAnimating];
+                    });
+                }
+            }
+            else if (requestType == TWRequestTypeRemoveRetweet)
+            {
+                if ([timeline isKindOfClass:[NSDictionary class]])
+                {
+                    NSLog(@"%@", timeline);
+                    NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/destroy/%@.json", [timeline valueForKeyPath:USER_RETWEETED_ID]];
+                    NSURL *url = [NSURL URLWithString:retweetString];
+                    [self twitterPostRequestWithURL:url twitterParameters:nil withRequestType:TWRequestTypeRemoveRetweet];
+                }
+            }
         } 
         else 
-        {
-            // Grab the available accounts
-            NSArray *twitterAccounts = [store accountsWithAccountType:twitterAccountType];
-            if ([twitterAccounts count] > 0) 
-            {
-                ACAccount *account = [twitterAccounts objectAtIndex:0];
-                request.account = account;
-                
-                //  Perform our request
-                [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
-                    if (responseData) 
-                    {
-                        //  Use the NSJSONSerialization class to parse the returned JSON
-                        NSError *jsonError;
-                        NSArray *timeline = 
-                        [NSJSONSerialization JSONObjectWithData:responseData 
-                                                        options:NSJSONReadingMutableLeaves 
-                                                          error:&jsonError];
-                        
-                        if (timeline) 
-                        {
-                            // We have an object that we can parse
-                            NSLog(@"%@", timeline);
-                            if ([timeline isKindOfClass:[NSArray class]])
-                            {
-                                self.twitterTableData = timeline;
-                            }
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                if ([timeline isKindOfClass:[NSDictionary class]])
-                                {
-                                    if ([timeline valueForKey:@"error"])
-                                    {
-                                        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ - Twitter", self.appConfiguration.appName] message:[timeline valueForKey:@"error"] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
-                                        [alertView show];
-                                    }
-                                }
-                                [self.activityIndicator stopAnimating];
-                            });
-                        } 
-                        else 
-                        { 
-                            // Inspect the contents of jsonError
-                            NSLog(@"%@", jsonError);
-                        }
-                    }
-                }]; 
-            }
+        { 
+            // Inspect the contents of jsonError
+            NSLog(@"%@", jsonError);
         }
-    }];
+    }]; 
 }
 
 - (void)retweetButtonPressed:(id)sender
@@ -208,20 +333,42 @@
     
     if ([retweetButton.titleLabel.text isEqualToString:@"Retweet"])
     {
-        self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-        self.activityIndicator.hidesWhenStopped = YES;
-        [self.activityIndicator startAnimating];
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+        self.tweetToRetweet = dictionaryData;
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:[NSString stringWithFormat:@"Retweet this to your followers - %@", [dictionaryData valueForKeyPath:TWITTER_TWEET]]
+                                            delegate:self
+                                   cancelButtonTitle:@"Cancel"
+                              destructiveButtonTitle:nil
+                                   otherButtonTitles:@"Retweet", nil];
         
-        NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/retweet/%@.json", [dictionaryData objectForKey:TWITTER_POST_ID]];
-        NSURL *url = [NSURL URLWithString:retweetString];
-        [self twitterRequestWithURL:url twitterParameters:nil twitterRequestMethod:TWRequestMethodPOST];
+        // Show the sheet
+        [sheet showFromTabBar:self.tabBarController.tabBar];
     }
     else 
     {
+        [self.activityIndicator startAnimating];
         
+        //  First, we create a dictionary to hold our request parameters
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+        [params setObject:@"1" forKey:@"include_my_retweet"];
+        
+        NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/show/%@.json", [dictionaryData objectForKey:TWITTER_POST_ID]];
+        NSURL *url = [NSURL URLWithString:retweetString];
+        [self twitterGetRequestWithURL:url twitterParameters:params withRequestType:TWRequestTypeRemoveRetweet];
     }
     
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if ([actionSheet firstOtherButtonIndex] == buttonIndex)
+    {
+        [self.activityIndicator startAnimating];
+        
+        NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/retweet/%@.json", [self.tweetToRetweet objectForKey:TWITTER_POST_ID]];
+        NSURL *url = [NSURL URLWithString:retweetString];
+        [self twitterPostRequestWithURL:url twitterParameters:nil withRequestType:TWRequestTypeRetweet];
+        self.tweetToRetweet = nil;
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
