@@ -96,6 +96,14 @@ typedef enum TWRequestType TWRequestType;
                 self.twitterAccount = [twitterAccounts objectAtIndex:0];
                 [self loadTwitterData];
             }
+            else
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSString *tmpString = @"Please create a Twitter Account in your iOS settings to continue";
+                    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Twitter", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+                    [alertView show];
+                });
+            }
             
         }
     }];
