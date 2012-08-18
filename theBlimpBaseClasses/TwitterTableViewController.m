@@ -229,7 +229,6 @@ typedef enum TWRequestType TWRequestType;
             else if (requestType == TWRequestTypeRemoveRetweet)
             {
                 id retweetedID = [timeline valueForKeyPath:@"retweeted_status.id"];
-                NSLog(@"%@", retweetedID);
                 if ([retweetedID isKindOfClass:[NSNumber class]])
                 {
                     for (int i = 0; i < [self.twitterTableData count]; i++)
@@ -308,7 +307,6 @@ typedef enum TWRequestType TWRequestType;
             {
                 if ([timeline isKindOfClass:[NSDictionary class]])
                 {
-                    NSLog(@"%@", timeline);
                     NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/destroy/%@.json", [timeline valueForKeyPath:USER_RETWEETED_ID]];
                     NSURL *url = [NSURL URLWithString:retweetString];
                     [self twitterPostRequestWithURL:url twitterParameters:nil withRequestType:TWRequestTypeRemoveRetweet];
