@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		BE26015715D893C1000F720D /* NSDate+Generic.h in Headers */ = {isa = PBXBuildFile; fileRef = BE26015515D893C1000F720D /* NSDate+Generic.h */; };
 		BE26015815D893C1000F720D /* NSDate+Generic.m in Sources */ = {isa = PBXBuildFile; fileRef = BE26015615D893C1000F720D /* NSDate+Generic.m */; };
+		BE2AC9D815E05591001DBCA2 /* TwitterConversationTableViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = BE2AC9D615E05591001DBCA2 /* TwitterConversationTableViewController.h */; };
+		BE2AC9D915E05591001DBCA2 /* TwitterConversationTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BE2AC9D715E05591001DBCA2 /* TwitterConversationTableViewController.m */; };
 		BEEB0AB515D9E7CE0026DD5E /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEEB0AB415D9E7CE0026DD5E /* Twitter.framework */; };
 		BEEB0AB715D9E85B0026DD5E /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEEB0AB615D9E85B0026DD5E /* Accounts.framework */; };
 		BEF4248415D6E2DF00C647BC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4248315D6E2DF00C647BC /* Foundation.framework */; };
@@ -70,6 +72,8 @@
 /* Begin PBXFileReference section */
 		BE26015515D893C1000F720D /* NSDate+Generic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Generic.h"; sourceTree = "<group>"; };
 		BE26015615D893C1000F720D /* NSDate+Generic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Generic.m"; sourceTree = "<group>"; };
+		BE2AC9D615E05591001DBCA2 /* TwitterConversationTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterConversationTableViewController.h; sourceTree = "<group>"; };
+		BE2AC9D715E05591001DBCA2 /* TwitterConversationTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterConversationTableViewController.m; sourceTree = "<group>"; };
 		BEEB0AB115D9CD760026DD5E /* 112-group.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "112-group.png"; sourceTree = "<group>"; };
 		BEEB0AB215D9CD760026DD5E /* f_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = f_logo.png; sourceTree = "<group>"; };
 		BEEB0AB415D9E7CE0026DD5E /* Twitter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Twitter.framework; path = System/Library/Frameworks/Twitter.framework; sourceTree = SDKROOT; };
@@ -240,6 +244,8 @@
 				BEF424C815D6E35500C647BC /* theBlimpBaseClasses-Prefix.pch */,
 				BEF424C915D6E35500C647BC /* TwitterTableViewController.h */,
 				BEF424CA15D6E35500C647BC /* TwitterTableViewController.m */,
+				BE2AC9D615E05591001DBCA2 /* TwitterConversationTableViewController.h */,
+				BE2AC9D715E05591001DBCA2 /* TwitterConversationTableViewController.m */,
 				BEF424CD15D6E35500C647BC /* WebViewController.h */,
 				BEF424CE15D6E35500C647BC /* WebViewController.m */,
 				BEF424CF15D6E35500C647BC /* XMLReader.h */,
@@ -309,6 +315,7 @@
 				BEF424F015D6E35500C647BC /* UITextView+Facebook.h in Headers */,
 				BEF424F215D6E35500C647BC /* WebViewController.h in Headers */,
 				BEF424F415D6E35500C647BC /* XMLReader.h in Headers */,
+				BE2AC9D815E05591001DBCA2 /* TwitterConversationTableViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,6 +428,7 @@
 				BEF424F315D6E35500C647BC /* WebViewController.m in Sources */,
 				BEF424F515D6E35500C647BC /* XMLReader.m in Sources */,
 				BE26015815D893C1000F720D /* NSDate+Generic.m in Sources */,
+				BE2AC9D915E05591001DBCA2 /* TwitterConversationTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

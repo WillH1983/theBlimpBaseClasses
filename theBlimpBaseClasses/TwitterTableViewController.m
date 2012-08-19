@@ -13,17 +13,9 @@
 #import "WebViewController.h"
 #import "NSMutableDictionary+appConfiguration.h"
 #import "NSDate+Generic.h"
-
-enum TWRequestType {
-    TWRequestTypeRetweet,
-    TWRequestTypeRemoveRetweet,
-    TWRequestTypeGetTimeline
-};
-
-typedef enum TWRequestType TWRequestType;
+#import "TwitterConversationTableViewController.h"
 
 @interface TwitterTableViewController () <UIActionSheetDelegate>
-@property (nonatomic, strong) NSMutableDictionary *appConfiguration;
 @property (nonatomic, strong) UITableViewCell *twitterCell;
 @property (nonatomic, strong) NSDictionary *tweetToRetweet;
 @property (nonatomic, strong) ACAccount *twitterAccount;
@@ -357,7 +349,7 @@ typedef enum TWRequestType TWRequestType;
         NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
         [params setObject:@"1" forKey:@"include_my_retweet"];
         
-        NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/show/%@.json", [dictionaryData objectForKey:TWITTER_POST_ID]];
+        NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/show/%@.json", [dictionaryData objectForKey:TWEET_ID]];
         NSURL *url = [NSURL URLWithString:retweetString];
         [self twitterGetRequestWithURL:url twitterParameters:params withRequestType:TWRequestTypeRemoveRetweet];
     }
@@ -370,7 +362,7 @@ typedef enum TWRequestType TWRequestType;
     {
         [self.activityIndicator startAnimating];
         
-        NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/retweet/%@.json", [self.tweetToRetweet objectForKey:TWITTER_POST_ID]];
+        NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/retweet/%@.json", [self.tweetToRetweet objectForKey:TWEET_ID]];
         NSURL *url = [NSURL URLWithString:retweetString];
         [self twitterPostRequestWithURL:url twitterParameters:nil withRequestType:TWRequestTypeRetweet];
         self.tweetToRetweet = nil;
@@ -472,6 +464,16 @@ typedef enum TWRequestType TWRequestType;
     {
         [segue.destinationViewController setUrlToLoad:sender];
     }
+    else if ([segue.identifier isEqualToString:@"twitterConversation"])
+    {
+        [segue.destinationViewController setTweetForConversation:sender];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *cellDictionary = [self.twitterTableData objectAtIndex:indexPath.row];
+    [self performSegueWithIdentifier:@"twitterConversation" sender:cellDictionary];
 }
 
 @end
