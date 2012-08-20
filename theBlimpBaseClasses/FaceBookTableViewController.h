@@ -9,9 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "Facebook.h"
 #import "SocialMediaDetailViewController.h"
-#import "ImagoDeiTextEntryViewController.h"
+#import "TextEntryViewController.h"
 
-@interface FaceBookTableViewController : UITableViewController <FBSessionDelegate,FBRequestDelegate, FBDialogDelegate, SocialMediaDetailViewControllerDelegate, ImagoDeiTextEntryDelegate>
+@interface FaceBookTableViewController : UITableViewController <FBSessionDelegate,FBRequestDelegate, FBDialogDelegate, SocialMediaDetailViewControllerDelegate, TextEntryDelegate>
 
 @property (nonatomic, strong) Facebook *facebook;
 @property (nonatomic, strong) NSArray *facebookArrayTableData;

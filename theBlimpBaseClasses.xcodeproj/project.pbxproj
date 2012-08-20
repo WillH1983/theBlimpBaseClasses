@@ -30,8 +30,8 @@
 		BEF424D815D6E35500C647BC /* FBRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = BEF424B315D6E35500C647BC /* FBRequest.h */; settings = {ATTRIBUTES = (); }; };
 		BEF424D915D6E35500C647BC /* ImageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = BEF424B415D6E35500C647BC /* ImageViewController.h */; settings = {ATTRIBUTES = (); }; };
 		BEF424DA15D6E35500C647BC /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BEF424B515D6E35500C647BC /* ImageViewController.m */; };
-		BEF424DB15D6E35500C647BC /* ImagoDeiTextEntryViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = BEF424B615D6E35500C647BC /* ImagoDeiTextEntryViewController.h */; settings = {ATTRIBUTES = (); }; };
-		BEF424DC15D6E35500C647BC /* ImagoDeiTextEntryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BEF424B715D6E35500C647BC /* ImagoDeiTextEntryViewController.m */; };
+		BEF424DB15D6E35500C647BC /* TextEntryViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = BEF424B615D6E35500C647BC /* TextEntryViewController.h */; settings = {ATTRIBUTES = (); }; };
+		BEF424DC15D6E35500C647BC /* TextEntryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BEF424B715D6E35500C647BC /* TextEntryViewController.m */; };
 		BEF424DD15D6E35500C647BC /* JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = BEF424B815D6E35500C647BC /* JSON.h */; settings = {ATTRIBUTES = (); }; };
 		BEF424DE15D6E35500C647BC /* libfacebook_ios_sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF424B915D6E35500C647BC /* libfacebook_ios_sdk.a */; };
 		BEF424DF15D6E35500C647BC /* NSMutableDictionary+appConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = BEF424BA15D6E35500C647BC /* NSMutableDictionary+appConfiguration.h */; settings = {ATTRIBUTES = (); }; };
@@ -100,8 +100,8 @@
 		BEF424B315D6E35500C647BC /* FBRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBRequest.h; sourceTree = "<group>"; };
 		BEF424B415D6E35500C647BC /* ImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageViewController.h; sourceTree = "<group>"; };
 		BEF424B515D6E35500C647BC /* ImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageViewController.m; sourceTree = "<group>"; };
-		BEF424B615D6E35500C647BC /* ImagoDeiTextEntryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagoDeiTextEntryViewController.h; sourceTree = "<group>"; };
-		BEF424B715D6E35500C647BC /* ImagoDeiTextEntryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagoDeiTextEntryViewController.m; sourceTree = "<group>"; };
+		BEF424B615D6E35500C647BC /* TextEntryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextEntryViewController.h; sourceTree = "<group>"; };
+		BEF424B715D6E35500C647BC /* TextEntryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextEntryViewController.m; sourceTree = "<group>"; };
 		BEF424B815D6E35500C647BC /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSON.h; sourceTree = "<group>"; };
 		BEF424B915D6E35500C647BC /* libfacebook_ios_sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfacebook_ios_sdk.a; sourceTree = "<group>"; };
 		BEF424BA15D6E35500C647BC /* NSMutableDictionary+appConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+appConfiguration.h"; sourceTree = "<group>"; };
@@ -235,8 +235,8 @@
 				BEF424AD15D6E35500C647BC /* FaceBookTableViewController.m */,
 				BEF424B415D6E35500C647BC /* ImageViewController.h */,
 				BEF424B515D6E35500C647BC /* ImageViewController.m */,
-				BEF424B615D6E35500C647BC /* ImagoDeiTextEntryViewController.h */,
-				BEF424B715D6E35500C647BC /* ImagoDeiTextEntryViewController.m */,
+				BEF424B615D6E35500C647BC /* TextEntryViewController.h */,
+				BEF424B715D6E35500C647BC /* TextEntryViewController.m */,
 				BEF424C015D6E35500C647BC /* RSSTableView.h */,
 				BEF424C115D6E35500C647BC /* RSSTableView.m */,
 				BEF424C615D6E35500C647BC /* SocialMediaDetailViewController.h */,
@@ -298,7 +298,7 @@
 				BEF424D715D6E35500C647BC /* FBLoginDialog.h in Headers */,
 				BEF424D815D6E35500C647BC /* FBRequest.h in Headers */,
 				BEF424D915D6E35500C647BC /* ImageViewController.h in Headers */,
-				BEF424DB15D6E35500C647BC /* ImagoDeiTextEntryViewController.h in Headers */,
+				BEF424DB15D6E35500C647BC /* TextEntryViewController.h in Headers */,
 				BEF424DD15D6E35500C647BC /* JSON.h in Headers */,
 				BEF424DF15D6E35500C647BC /* NSMutableDictionary+appConfiguration.h in Headers */,
 				BEF424E115D6E35500C647BC /* NSObject+SBJSON.h in Headers */,
@@ -418,7 +418,7 @@
 			files = (
 				BEF424D315D6E35500C647BC /* FaceBookTableViewController.m in Sources */,
 				BEF424DA15D6E35500C647BC /* ImageViewController.m in Sources */,
-				BEF424DC15D6E35500C647BC /* ImagoDeiTextEntryViewController.m in Sources */,
+				BEF424DC15D6E35500C647BC /* TextEntryViewController.m in Sources */,
 				BEF424E015D6E35500C647BC /* NSMutableDictionary+appConfiguration.m in Sources */,
 				BEF424E315D6E35500C647BC /* NSString+HTML.m in Sources */,
 				BEF424E615D6E35500C647BC /* RSSTableView.m in Sources */,

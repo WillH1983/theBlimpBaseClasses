@@ -447,6 +447,8 @@
     else if ([segue.identifier isEqualToString:@"comment"])
     {
         [segue.destinationViewController setTextEntryDelegate:self];
+        [segue.destinationViewController setSubmitButtonTitle:@"Post"];
+        [segue.destinationViewController setWindowTitle:@"Comment"];
     }
 }
 

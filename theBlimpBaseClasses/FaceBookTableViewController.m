@@ -608,6 +608,8 @@
     {
         [segue.destinationViewController setTextEntryDelegate:self];
         [segue.destinationViewController setDictionaryForComment:sender];
+        [segue.destinationViewController setSubmitButtonTitle:@"Post"];
+        [segue.destinationViewController setWindowTitle:@"Comment"];
     }
 }
 

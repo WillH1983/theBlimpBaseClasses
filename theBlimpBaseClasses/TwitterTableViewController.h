@@ -11,6 +11,7 @@
 enum TWRequestType {
     TWRequestTypeRetweet,
     TWRequestTypeRemoveRetweet,
+    TWRequestTypeTweet,
     TWRequestTypeGetTimeline,
     TWRequestTypeGetTweetsForConversation
 };
@@ -29,6 +30,7 @@ typedef enum TWRequestType TWRequestType;
 
 #define TWITTER_TWEET @"text"
 #define TWITTER_NAME @"user.name"
+#define TWITTER_SCREEN_NAME @"user.screen_name"
 #define TWITTER_PROFILE_IMAGE @"user.profile_image_url"
 #define TWITTER_SCREEN_NAME @"user.screen_name"
 #define TWITTER_POSTED_DATE @"created_at"

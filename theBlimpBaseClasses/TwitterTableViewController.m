@@ -14,8 +14,9 @@
 #import "NSMutableDictionary+appConfiguration.h"
 #import "NSDate+Generic.h"
 #import "TwitterConversationTableViewController.h"
+#import "TextEntryViewController.h"
 
-@interface TwitterTableViewController () <UIActionSheetDelegate>
+@interface TwitterTableViewController () <UIActionSheetDelegate, TextEntryDelegate>
 @property (nonatomic, strong) UITableViewCell *twitterCell;
 @property (nonatomic, strong) NSDictionary *tweetToRetweet;
 @property (nonatomic, strong) ACAccount *twitterAccount;
@@ -247,6 +248,10 @@
                     [self.activityIndicator stopAnimating];
                 });
             }
+            else if (requestType == TWRequestTypeTweet)
+            {
+                NSLog(@"%@", timeline);
+            }
         }
     } 
     else 
@@ -356,6 +361,26 @@
     
 }
 
+- (void)viewConversationButtonPressed:(id)sender
+{
+    UIView *contentView = [sender superview];
+    UITableViewCell *cell = (UITableViewCell *)[contentView superview];
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+    
+    NSDictionary *cellDictionary = [self.twitterTableData objectAtIndex:indexPath.row];
+    [self performSegueWithIdentifier:@"twitterConversation" sender:cellDictionary];
+}
+
+- (void)replyButtonPressed:(id)sender
+{
+    UIView *contentView = [sender superview];
+    UITableViewCell *cell = (UITableViewCell *)[contentView superview];
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+    
+    NSDictionary *cellDictionary = [self.twitterTableData objectAtIndex:indexPath.row];
+    [self performSegueWithIdentifier:@"twitterReply" sender:cellDictionary];
+}
+
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if ([actionSheet firstOtherButtonIndex] == buttonIndex)
@@ -380,6 +405,10 @@
     UILabel *postedDate = (UILabel *)[cell.contentView viewWithTag:5];
     UIButton *retweetButton = (UIButton *)[cell.contentView viewWithTag:6];
     [retweetButton addTarget:self action:@selector(retweetButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    UIButton *viewConversationButton = (UIButton *)[cell.contentView viewWithTag:7];
+    [viewConversationButton addTarget:self action:@selector(viewConversationButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    UIButton *replyButton = (UIButton *)[cell.contentView viewWithTag:8];
+    [replyButton addTarget:self action:@selector(replyButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     NSDictionary *tweetDictionary = [self.twitterTableData objectAtIndex:indexPath.row];
     
@@ -393,6 +422,20 @@
         [retweetButton setTitle:@"Retweet" forState:UIControlStateNormal];
     }
     
+    id replyID = [tweetDictionary valueForKey:TWEET_IN_REPLY_ID];
+    if (replyID != [NSNull null])
+    {
+        [viewConversationButton setTitle:@"View Conversation" forState:UIControlStateNormal];
+        [viewConversationButton addTarget:self action:@selector(viewConversationButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    else
+    {
+        [viewConversationButton setTitle:nil forState:UIControlStateNormal];
+        viewConversationButton.titleLabel.text = nil;
+        [viewConversationButton removeTarget:self action:@selector(viewConversationButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    
     postedBy.text = [tweetDictionary valueForKeyPath:TWITTER_NAME];
     NSString *screenName = [tweetDictionary valueForKeyPath:TWITTER_SCREEN_NAME];
     twitterScreenName.text = [NSString stringWithFormat:@"@%@", screenName];
@@ -403,6 +446,8 @@
     CGFloat heightChange = tweetText.frame.size.height - oldHeight;
 
     retweetButton.frame = CGRectMake(retweetButton.frame.origin.x, retweetButton.frame.origin.y + heightChange, retweetButton.frame.size.width, retweetButton.frame.size.height);
+    viewConversationButton.frame = CGRectMake(viewConversationButton.frame.origin.x, viewConversationButton.frame.origin.y + heightChange, viewConversationButton.frame.size.width, viewConversationButton.frame.size.height);
+    replyButton.frame = CGRectMake(replyButton.frame.origin.x, replyButton.frame.origin.y + heightChange, replyButton.frame.size.width, replyButton.frame.size.height);
     NSDate *date = [[NSDate alloc] initTwitterDateFormatWithString:[tweetDictionary valueForKeyPath:TWITTER_POSTED_DATE]];
     postedDate.text = date.socialDate;
     
@@ -468,12 +513,33 @@
     {
         [segue.destinationViewController setTweetForConversation:sender];
     }
+    else if ([segue.identifier isEqualToString:@"twitterReply"])
+    {
+        [segue.destinationViewController setDictionaryForComment:sender];
+        [segue.destinationViewController setSubmitButtonTitle:@"Reply"];
+        [segue.destinationViewController setWindowTitle:@"Tweet Reply"];
+        [segue.destinationViewController setTextEntryDelegate:self];
+    }
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionaryForComment:(NSDictionary *)dictionary
 {
-    NSDictionary *cellDictionary = [self.twitterTableData objectAtIndex:indexPath.row];
-    [self performSegueWithIdentifier:@"twitterConversation" sender:cellDictionary];
+    [self.activityIndicator startAnimating];
+    
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+    NSString *tweetString = [NSString stringWithFormat:@"@%@ %@", [dictionary valueForKeyPath:TWITTER_SCREEN_NAME], string];
+    [params setObject:tweetString forKey:@"status"];
+    [params setObject:[dictionary valueForKey:TWEET_ID] forKey:@"in_reply_to_status_id"];
+    
+    //  Next, we create an URL that points to the target endpoint
+    NSURL *url = [NSURL URLWithString:@"http://api.twitter.com/1/statuses/update.json"];
+    
+    [self twitterPostRequestWithURL:url twitterParameters:params withRequestType:TWRequestTypeTweet];
+}
+
+- (void)textViewDidCancel:(UITextView *)textView
+{
+    
 }
 
 @end
