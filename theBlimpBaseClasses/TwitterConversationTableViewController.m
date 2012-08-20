@@ -55,11 +55,6 @@
     [self twitterGetRequestWithURL:url twitterParameters:nil withRequestType:TWRequestTypeGetTweetsForConversation];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
 - (void)twitterGetRequestWithURL:(NSURL *)url twitterParameters:(NSMutableDictionary *)parms withRequestType:(TWRequestType)requestType
 {
     //  Now we can create our request.  Note that we are performing a GET request.
@@ -134,6 +129,11 @@
             NSLog(@"%@", jsonError);
         }
     }]; 
+}
+
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    [self.tableView reloadData];
 }
 
 @end

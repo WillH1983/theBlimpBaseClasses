@@ -179,6 +179,8 @@
     //Begin the facebook request, the data that comes back form this method will be used
     //to populate the UITableView
     if ([self.facebookArrayTableData count] == 0) [self.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] andDelegate:self];
+    
+    [self.tableView reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated

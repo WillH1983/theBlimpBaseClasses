@@ -70,36 +70,6 @@
                                              selector:@selector(presentWebView:) 
                                                  name:@"urlSelected"
                                                object:nil];
-    
-    ACAccountStore *store = [[ACAccountStore alloc] init];
-    ACAccountType *twitterAccountType = [store accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
-    
-    //  Request permission from the user to access the available Twitter accounts
-    [store requestAccessToAccountsWithType:twitterAccountType withCompletionHandler:^(BOOL granted, NSError *error) {
-        if (!granted) 
-        {
-            // The user rejected your request 
-            NSLog(@"User rejected access to the account.");
-        } 
-        else 
-        {
-            NSArray *twitterAccounts = [store accountsWithAccountType:twitterAccountType];
-            if ([twitterAccounts count] > 0)
-            {
-                self.twitterAccount = [twitterAccounts objectAtIndex:0];
-                [self loadTwitterData];
-            }
-            else
-            {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSString *tmpString = @"Please create a Twitter Account in your iOS settings to continue";
-                    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Twitter", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
-                    [alertView show];
-                });
-            }
-            
-        }
-    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -137,7 +107,42 @@
     id appDelegate = (id)[[UIApplication sharedApplication] delegate];
     self.appConfiguration = [appDelegate appConfiguration];
     
+    ACAccountStore *store = [[ACAccountStore alloc] init];
+    ACAccountType *twitterAccountType = [store accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
     
+    //  Request permission from the user to access the available Twitter accounts
+    [store requestAccessToAccountsWithType:twitterAccountType withCompletionHandler:^(BOOL granted, NSError *error) {
+        if (!granted) 
+        {
+            // The user rejected your request 
+            NSLog(@"User rejected access to the account.");
+        } 
+        else 
+        {
+            NSArray *twitterAccounts = [store accountsWithAccountType:twitterAccountType];
+            if ([twitterAccounts count] > 0)
+            {
+                self.twitterAccount = [twitterAccounts objectAtIndex:0];
+                [self loadTwitterData];
+            }
+            else
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSString *tmpString = @"Please create a Twitter Account in your iOS settings to continue";
+                    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Twitter", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+                    [alertView show];
+                });
+            }
+            
+        }
+    }];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [self.tableView reloadData];
 }
 
 - (void)viewDidUnload
@@ -539,7 +544,7 @@
 
 - (void)textViewDidCancel:(UITextView *)textView
 {
-    
+    [self.tableView reloadData];
 }
 
 @end
