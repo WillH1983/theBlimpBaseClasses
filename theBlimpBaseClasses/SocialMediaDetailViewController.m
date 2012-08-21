@@ -98,7 +98,7 @@
 {
     //When the view disappears the code in this fucnction removes all delegation to this class
     //This is required incase a connection request is in progress when the view disappears
-    [self.facebookRequest setDelegate:nil];
+    //[self.facebookRequest setDelegate:nil];
     
     [super viewDidDisappear:animated];
 }
@@ -385,8 +385,8 @@
     //If there is a right bar button item, put it back
     self.navigationItem.rightBarButtonItem = self.oldBarButtonItem;
     
-    if ([request.httpMethod isEqualToString:@"GET"])
-    {
+    //if ([request.httpMethod isEqualToString:@"GET"])
+    //{
         if ([result isKindOfClass:[NSDictionary class]])
         {
             self.fullCommentsDictionaryModel = result;
@@ -394,11 +394,11 @@
         }
         //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
     
-    }
-    else {
+    //}
+    //else {
         NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
         [self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:graphAPIString];
-    }
+    //}
     
 }
 

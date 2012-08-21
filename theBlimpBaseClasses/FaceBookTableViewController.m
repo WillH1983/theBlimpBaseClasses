@@ -7,7 +7,7 @@
 //
 
 #import "FaceBookTableViewController.h"
-#import "Facebook.h"
+#import <FacebookSDK/FacebookSDK.h>
 #import "WebViewController.h"
 #import "ImageViewController.h"
 #import "UITextView+Facebook.h"
@@ -25,7 +25,6 @@
 @end
 
 @implementation FaceBookTableViewController
-@synthesize facebook = _facebook;
 @synthesize facebookRequest = _facebookRequest;
 @synthesize photoDictionary = _photoDictionary;
 @synthesize facebookArrayTableData = _facebookArrayTableData;
@@ -89,16 +88,43 @@
     //and set the title of the button to Log In
     if ([barButton.title isEqualToString: @"Log Out"])
     {
-        [self.facebook logout];
+        [[FBSession activeSession] closeAndClearTokenInformation];
         barButton.title = @"Log In";
     }
     //If the barbutton says Log In, check if the facebook session is still valid
     else if ([barButton.title isEqualToString: @"Log In"])
     {
         //If it is not valid, reauthorize the app for single sign on
-        if (![self.facebook isSessionValid]) 
+        if (![FBSession activeSession].isOpen) 
         {
-            [self.facebook authorize:[[NSArray alloc] initWithObjects:@"publish_stream", nil]];
+            NSArray *params = [[NSArray alloc] initWithObjects:@"publish_stream", nil];
+            [FBSession openActiveSessionWithPermissions:params allowLoginUI:YES completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
+                
+                //Set the right navigation bar button item to the activity indicator
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+                
+                //Since facebook had to log in, data will need to be requested, start the activity indicator
+                [self.activityIndicator startAnimating];
+                
+                //Retrieve the left bar button item, and change the text to "Log Out"
+                self.navigationItem.leftBarButtonItem.title = @"Log Out";
+                
+                //This method will request the full comments array from the delegate and
+                
+                [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+                    //Retireve the User Defaults
+                    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                    
+                    //Pull the accessToken, and expirationDate from the facebook instance, and
+                    //save them to the user defaults
+                    [defaults setObject:[result valueForKey:@"id"] forKey:@"userNameID"];
+                    [defaults synchronize];
+                    
+                    [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+                        [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+                    }];
+                }];
+            }];
         }
     }
 }
@@ -124,11 +150,10 @@
     //and it stops the loading
     
     //This is required incase a connection request is in progress when the view disappears
-    [self.facebookRequest setDelegate:nil];
+    //[self.facebookRequest setDelegate:nil];
     
     //This is required incase a facebook method completes after the view has disappered
-    id appDelegate = (id)[[UIApplication sharedApplication] delegate];
-    [appDelegate facebook].sessionDelegate = nil;
+    
     
     //Super method
     [super viewDidDisappear:animated];
@@ -164,11 +189,8 @@
     id appDelegate = (id)[[UIApplication sharedApplication] delegate];
     self.appConfiguration = [appDelegate appConfiguration];
     
-    //Init the facebook session
-    [self facebookInit];
-    
     //If the facebook session is already valid, the barButtonItem will be change to say "Log Out"
-    if ([self.facebook isSessionValid]) 
+    if ([FBSession activeSession].isOpen) 
     {
         self.navigationItem.leftBarButtonItem.title = @"Log Out";
     }
@@ -178,7 +200,18 @@
     
     //Begin the facebook request, the data that comes back form this method will be used
     //to populate the UITableView
-    if ([self.facebookArrayTableData count] == 0) [self.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] andDelegate:self];
+    if ([self.facebookArrayTableData count] == 0)
+    {
+        //Set the right navigation bar button item to the activity indicator
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+        
+        //Since facebook had to log in, data will need to be requested, start the activity indicator
+        [self.activityIndicator startAnimating];
+        
+        [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+            [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+        }];
+    }
     
     [self.tableView reloadData];
 }
@@ -257,12 +290,28 @@
 
     if ([likeButton.titleLabel.text isEqualToString:@"Like"])
     {
-        [self.facebook requestWithGraphPath:graphAPIString andParams:[[NSMutableDictionary alloc]init] andHttpMethod:@"POST" andDelegate:self];
+        //Set the right navigation bar button item to the activity indicator
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+        
+        //Since facebook had to log in, data will need to be requested, start the activity indicator
+        [self.activityIndicator startAnimating];
+        
+        [FBRequestConnection startWithGraphPath:graphAPIString parameters:[[NSMutableDictionary alloc] init] HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+            [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+        }];
         [likeButton setTitle:@"Unlike" forState:UIControlStateNormal]; 
         
     }
     else {
-        [self.facebook requestWithGraphPath:graphAPIString andParams:[[NSMutableDictionary alloc] init] andHttpMethod:@"DELETE" andDelegate:self];
+        //Set the right navigation bar button item to the activity indicator
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+        
+        //Since facebook had to log in, data will need to be requested, start the activity indicator
+        [self.activityIndicator startAnimating];
+        
+        [FBRequestConnection startWithGraphPath:graphAPIString parameters:[[NSMutableDictionary alloc] init] HTTPMethod:@"DELETE" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+            [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+        }];
         [likeButton setTitle:@"Like" forState:UIControlStateNormal];
     }
     
@@ -273,7 +322,15 @@
     NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [dictionary valueForKeyPath:@"id"]];
     NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil];
     
-    [self.facebook requestWithGraphPath:graphAPIString andParams:params andHttpMethod:@"POST" andDelegate:self];
+    //Set the right navigation bar button item to the activity indicator
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    
+    //Since facebook had to log in, data will need to be requested, start the activity indicator
+    [self.activityIndicator startAnimating];
+    
+    [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+    }];
 }
 
 - (void)textViewDidCancel:(UITextView *)textView
@@ -615,6 +672,48 @@
     }
 }
 
+- (void)processGetFeedRequestWithConnection:(FBRequestConnection *)connection withResults:(id)result postError:(NSError *)error
+{
+    
+    if (error)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //Since the request has been recieved, and parsed, stop the Activity Indicator
+            [self.activityIndicator stopAnimating];
+            self.facebookArrayTableData = nil;
+            [self.tableView reloadData];
+            //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+            NSDictionary *errorDictionary = [error userInfo];
+            NSString *errorMessage = [errorDictionary valueForKeyPath:@"error.message"];
+            NSNumber *errorCode = [errorDictionary valueForKeyPath:@"error.code"];
+            NSString *tmpString = nil;
+            if ([errorCode intValue] == 104) tmpString = @"Please Log In to continue";
+            else tmpString = errorMessage;
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Facebook", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+            [alertView show];
+        });
+    }
+    //Verify the result from the facebook class is actually a dictionary
+    else if ([result isKindOfClass:[NSDictionary class]])
+    {
+        
+        NSMutableArray *array = [result mutableArrayValueForKey:@"data"];
+        
+        //Set the property equal to the new comments array, which will then trigger a table reload
+        self.facebookArrayTableData = array;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //Since the request has been recieved, and parsed, stop the Activity Indicator
+        [self.activityIndicator stopAnimating];
+        
+        //If an oldbutton was removed from the right bar button spot, put it back
+        self.navigationItem.rightBarButtonItem = self.oldBarButtonItem;
+        
+        //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+    });
+}
+
 #pragma mark - SocialMediaDetailView datasource
 
 - (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender
@@ -622,56 +721,48 @@
 {
     NSLog(@"Loading Web Data - Social Media View Controller");
     
+    //Set the right navigation bar button item to the activity indicator
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    
+    //Since facebook had to log in, data will need to be requested, start the activity indicator
+    [self.activityIndicator startAnimating];
+    
     //When the SocialMediaDetailViewController needs further information from
     //the facebook class, this method is called
-    [self.facebook requestWithGraphPath:facebookGraphAPIString andDelegate:sender];
+    [FBRequestConnection startWithGraphPath:facebookGraphAPIString completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+    }];
 }
 
 - (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender
       postDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString
                          withParameters:(NSMutableDictionary *)params
 {
-    [self.facebook requestWithGraphPath:facebookGraphAPIString
-                              andParams:params andHttpMethod:@"POST"
-                            andDelegate:sender];
+    //Set the right navigation bar button item to the activity indicator
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    
+    //Since facebook had to log in, data will need to be requested, start the activity indicator
+    [self.activityIndicator startAnimating];
+    [FBRequestConnection startWithGraphPath:facebookGraphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+    }];
 }
 
 - (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender 
     deleteDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString 
                          withParameters:(NSMutableDictionary *)params
 {
-    [self.facebook requestWithGraphPath:facebookGraphAPIString
-                              andParams:params andHttpMethod:@"DELETE"
-                            andDelegate:sender];
+    //Set the right navigation bar button item to the activity indicator
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    
+    //Since facebook had to log in, data will need to be requested, start the activity indicator
+    [self.activityIndicator startAnimating];
+    [FBRequestConnection startWithGraphPath:facebookGraphAPIString parameters:params HTTPMethod:@"DELETE" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+    }];
 }
 
 #pragma mark - Facebook Initialization Method
-
-- (void)facebookInit
-{
-    //Retrieve a pointer to the appDelegate
-    id appDelegate = (id)[[UIApplication sharedApplication] delegate];
-
-    //Set the local facebook property to point to the appDelegate facebook property
-    self.facebook = [appDelegate facebook];
-    
-    //Set the facebook session delegate to this class
-    self.facebook.sessionDelegate = self;
-    
-    //Retrieve the user defaults and store them in a variable
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    //If the User defaults contain the facebook access tokens, save them into the
-    //facebook instance
-    if ([defaults objectForKey:@"FBAccessTokenKey"] 
-        && [defaults objectForKey:@"FBExpirationDateKey"]
-        && [defaults objectForKey:@"userNameID"]) 
-    {
-        self.facebook.accessToken = [defaults objectForKey:@"FBAccessTokenKey"];
-        self.facebook.expirationDate = [defaults objectForKey:@"FBExpirationDateKey"];
-        self.userNameID = [defaults objectForKey:@"userNameID"];
-    }
-}
 
 #pragma mark - Facebook Dialog Methods
 
@@ -683,147 +774,11 @@
                                    self.appConfiguration.facebookFeedToRequest, @"to",
                                    nil];
     
-    [self.facebook dialog:@"feed" andParams:params andDelegate:self];
-}
-
-- (void)dialogDidComplete:(FBDialog *)dialog
-{
-    [self.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] andDelegate:self];
-}
-
-#pragma mark - Facebook Request Delegate Methods
-
-- (void)requestLoading:(FBRequest *)request
-{
-    //When a facebook request starts, save the request
-    //so the delegate can be set to nill when the view disappears
-    self.facebookRequest = request;
-    
-    [self.activityIndicator startAnimating];
-    
-    //Set the right navigation bar button item to the activity indicator
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
-}
-
-- (void)request:(FBRequest *)request didFailWithError:(NSError *)error
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        //Since the request has been recieved, and parsed, stop the Activity Indicator
-        [self.activityIndicator stopAnimating];
-        self.facebookArrayTableData = nil;
-        [self.tableView reloadData];
-        //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
-        NSDictionary *errorDictionary = [error userInfo];
-        NSString *errorMessage = [errorDictionary valueForKeyPath:@"error.message"];
-        NSNumber *errorCode = [errorDictionary valueForKeyPath:@"error.code"];
-        NSString *tmpString = nil;
-        if ([errorCode intValue] == 104) tmpString = @"Please Log In to continue";
-        else tmpString = errorMessage;
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Facebook", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
-        [alertView show];
-    });
-    
-}
-
-- (void)request:(FBRequest *)request didLoad:(id)result
-{
-    //Since the facebook request is complete, and setting the delegate to nil
-    //will not be required if the view disappears, set the request to nil
-    self.facebookRequest = nil;
-    NSString *lastPath = [request.url lastPathComponent];
-    
-    if ([request.httpMethod isEqualToString:@"GET"] & [lastPath isEqualToString:@"feed"])
-    {
-        //Verify the result from the facebook class is actually a dictionary
-        if ([result isKindOfClass:[NSDictionary class]])
-        {
-            
-            NSMutableArray *array = [result mutableArrayValueForKey:@"data"];
-            
-            //Set the property equal to the new comments array, which will then trigger a table reload
-            self.facebookArrayTableData = array;
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            //Since the request has been recieved, and parsed, stop the Activity Indicator
-            [self.activityIndicator stopAnimating];
-            
-            //If an oldbutton was removed from the right bar button spot, put it back
-            self.navigationItem.rightBarButtonItem = self.oldBarButtonItem;
-            
-            //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
-        });
-    }
-    else if ([lastPath isEqualToString:@"me"])
-    {
-        //Retireve the User Defaults
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        
-        //Pull the accessToken, and expirationDate from the facebook instance, and
-        //save them to the user defaults
-        [defaults setObject:[result valueForKey:@"id"] forKey:@"userNameID"];
-        [defaults synchronize];
-        
-        [self.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] andDelegate:self];
-    }
-    else 
-    {
-        [self.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] andDelegate:self];
-    }
-    
+    //[self.facebook dialog:@"feed" andParams:params andDelegate:self];
 }
 
 
 #pragma mark - Facebook Session Delegate Methods
-
-- (void)fbDidLogin 
-{
-    //Since facebook had to log in, data will need to be requested, start the activity indicator
-    [self.activityIndicator startAnimating];
-    
-    //Retireve the User Defaults
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    //Pull the accessToken, and expirationDate from the facebook instance, and
-    //save them to the user defaults
-    [defaults setObject:[self.facebook accessToken] forKey:@"FBAccessTokenKey"];
-    [defaults setObject:[self.facebook expirationDate] forKey:@"FBExpirationDateKey"];
-    [defaults synchronize];
-    
-    //Retrieve the left bar button item, and change the text to "Log Out"
-    self.navigationItem.leftBarButtonItem.title = @"Log Out";
-    
-    //This method will request the full comments array from the delegate and
-    //the facebook class will call request:request didLoad:result when complete
-    //[self.facebook requestWithGraphPath:FACEBOOK_FEED_TO_REQUEST andDelegate:self];
-    [self.facebook requestWithGraphPath:@"me" andDelegate:self];
-}
-
-- (void)fbDidNotLogin:(BOOL)cancelled
-{
-    //Do nothing here for now, stubbed out to get rid of compiler warning
-    NSLog(@"I FAILED");
-}
-
-- (void) fbDidLogout 
-{
-    // Remove saved authorization information if it exists
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    if ([defaults objectForKey:@"FBAccessTokenKey"]) {
-        [defaults removeObjectForKey:@"FBAccessTokenKey"];
-        [defaults removeObjectForKey:@"FBExpirationDateKey"];
-        [defaults synchronize];
-    }
-}
-
-- (void)fbDidExtendToken:(NSString *)accessToken expiresAt:(NSDate *)expiresAt
-{
-    //Retrieve the user defaults, and save the new tokens
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:[self.facebook accessToken] forKey:@"FBAccessTokenKey"];
-    [defaults setObject:[self.facebook expirationDate] forKey:@"FBExpirationDateKey"];
-    [defaults synchronize];
-}
 
 - (void)fbSessionInvalidated
 {
@@ -838,7 +793,7 @@
 - (void)refresh {
     //This method will request the full comments array from the delegate and
     //the facebook class will call request:request didLoad:result when complete
-    [self.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] andDelegate:self];
+    //[self.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] andDelegate:self];
 }
 
 - (void) presentWebView:(NSNotification *) notification

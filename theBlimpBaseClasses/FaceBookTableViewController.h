@@ -7,13 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Facebook.h"
+#import <FacebookSDK/FacebookSDK.h>
 #import "SocialMediaDetailViewController.h"
 #import "TextEntryViewController.h"
 
-@interface FaceBookTableViewController : UITableViewController <FBSessionDelegate,FBRequestDelegate, FBDialogDelegate, SocialMediaDetailViewControllerDelegate, TextEntryDelegate>
+@interface FaceBookTableViewController : UITableViewController <SocialMediaDetailViewControllerDelegate, TextEntryDelegate>
 
-@property (nonatomic, strong) Facebook *facebook;
 @property (nonatomic, strong) NSArray *facebookArrayTableData;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
 @property (nonatomic, strong) UIBarButtonItem *oldBarButtonItem;
