@@ -11,19 +11,21 @@
 #import "WebViewController.h"
 #import "UITextView+Facebook.h"
 #import "NSDate+Generic.h"
+#import "NSMutableDictionary+appConfiguration.h"
+#import <FacebookSDK/FacebookSDK.h>
 
 @interface SocialMediaDetailViewController ()
 @property (nonatomic, strong) NSArray *commentsArray;
 @property (nonatomic, strong) UIImage *postImage;
 @property (nonatomic, strong) UIButton *buttonImage;
 @property (nonatomic, strong) FBRequest *facebookRequest;
+@property (nonatomic, strong) NSMutableDictionary *appConfiguration;
 @end
 
 @implementation SocialMediaDetailViewController
 @synthesize profilePictureImageView;
 @synthesize shortCommentsDictionaryModel = _shortCommentsDictionaryModel;
 @synthesize commentsArray = _commentsArray;
-@synthesize socialMediaDelegate = _socialMediaDelegate;
 @synthesize textView = _textView;
 @synthesize buttonImage = _buttonImage;
 @synthesize fullCommentsDictionaryModel = _fullCommentsDictionaryModel;
@@ -31,6 +33,7 @@
 @synthesize facebookRequest = _facebookRequest;
 @synthesize activityIndicator = _activityIndicator;
 @synthesize oldBarButtonItem = _oldBarButtonItem;
+@synthesize appConfiguration = _appConfiguration;
 
 #define FONT_SIZE 14.0f
 #define CELL_CONTENT_WIDTH 200.0f
@@ -49,8 +52,13 @@
 {
     [super viewDidLoad];
     
+    id appDelegate = [[UIApplication sharedApplication] delegate];
+    self.appConfiguration = [appDelegate appConfiguration];
+    
     //Do not allow the cells in the tableview to be selected
     [self.tableView setAllowsSelection:NO];
+    
+    self.oldBarButtonItem = self.navigationItem.rightBarButtonItem;
     
     //initialize the activity indicator, set it to the center top of the view, and
     //start it animating
@@ -60,7 +68,19 @@
     NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
     
     //Pull the full comments dictionary from the delegate to use as our Model
-    [self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:graphAPIString];
+    NSLog(@"Loading Web Data - Social Media View Controller");
+    
+    //Set the right navigation bar button item to the activity indicator
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    
+    //Since facebook had to log in, data will need to be requested, start the activity indicator
+    [self.activityIndicator startAnimating];
+    
+    //When the SocialMediaDetailViewController needs further information from
+    //the facebook class, this method is called
+    [FBRequestConnection startWithGraphPath:graphAPIString completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+    }];
     
 }
 
@@ -108,6 +128,45 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (void)processGetFeedRequestWithConnection:(FBRequestConnection *)connection withResults:(id)result postError:(NSError *)error
+{
+    
+    if (error)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //Since the request has been recieved, and parsed, stop the Activity Indicator
+            [self.activityIndicator stopAnimating];
+            self.fullCommentsDictionaryModel = nil;
+            [self.tableView reloadData];
+            //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+            NSDictionary *errorDictionary = [[error userInfo] valueForKey:@"com.facebook.sdk:ParsedJSONResponseKey"];
+            NSString *errorMessage = [errorDictionary valueForKeyPath:@"body.error.message"];
+            NSNumber *errorCode = [errorDictionary valueForKeyPath:@"body.error.code"];
+            NSString *tmpString = nil;
+            if ([errorCode intValue] == 104) tmpString = @"Please Log In to continue";
+            else tmpString = errorMessage;
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Facebook", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+            [alertView show];
+        });
+    }
+    //Verify the result from the facebook class is actually a dictionary
+    else if ([result isKindOfClass:[NSDictionary class]])
+    {
+        self.fullCommentsDictionaryModel = result;
+        [self loadSocialMediaView];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //Since the request has been recieved, and parsed, stop the Activity Indicator
+        [self.activityIndicator stopAnimating];
+        
+        //If an oldbutton was removed from the right bar button spot, put it back
+        self.navigationItem.rightBarButtonItem = self.oldBarButtonItem;
+        
+        //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+    });
+}
+
 - (void)likeButtonPressed:(id)sender
 {
     UIView *contentView = [sender superview];
@@ -118,25 +177,56 @@
     NSString *graphAPIString = [NSString stringWithFormat:@"%@/likes", [dictionaryData valueForKeyPath:@"id"]];
     UIButton *likeButton = sender;
     
+    //Set the right navigation bar button item to the activity indicator
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    
+    //Since facebook had to log in, data will need to be requested, start the activity indicator
+    [self.activityIndicator startAnimating];
+    
     if ([likeButton.titleLabel.text isEqualToString:@"Like"])
     {
-        //[self.facebook requestWithGraphPath:graphAPIString andParams:[[NSMutableDictionary alloc]init] andHttpMethod:@"POST" andDelegate:self];
-        [self.socialMediaDelegate SocialMediaDetailViewController:self 
-                                postDataForFacebookGraphAPIString:graphAPIString 
-                                                   withParameters:[[NSMutableDictionary alloc]init]];
-        
-        [likeButton setTitle:@"Unlike" forState:UIControlStateNormal]; 
+        [FBRequestConnection startWithGraphPath:graphAPIString parameters:[[NSMutableDictionary alloc] init] HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+            [self processPostRequestWithConnection:connection withResults:result postError:error];
+        }];
+        [likeButton setTitle:@"Unlike" forState:UIControlStateNormal];  
         
     }
     else {
         //[self.facebook requestWithGraphPath:graphAPIString andParams:[[NSMutableDictionary alloc] init] andHttpMethod:@"DELETE" andDelegate:self];
-        [self.socialMediaDelegate SocialMediaDetailViewController:self 
-                              deleteDataForFacebookGraphAPIString:graphAPIString
-                                                   withParameters:[[NSMutableDictionary alloc]init]];
-        
+        [FBRequestConnection startWithGraphPath:graphAPIString parameters:[[NSMutableDictionary alloc] init] HTTPMethod:@"DELETE" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+            [self processPostRequestWithConnection:connection withResults:result postError:error];
+        }];
         [likeButton setTitle:@"Like" forState:UIControlStateNormal];
     }
     
+}
+
+- (void)processPostRequestWithConnection:(FBRequestConnection *)connection withResults:(id)result postError:(NSError *)error
+{
+    if (error)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //Since the request has been recieved, and parsed, stop the Activity Indicator
+            [self.activityIndicator stopAnimating];
+            self.fullCommentsDictionaryModel = nil;
+            [self.tableView reloadData];
+            //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+            NSDictionary *errorDictionary = [[error userInfo] valueForKey:@"com.facebook.sdk:ParsedJSONResponseKey"];
+            NSString *errorMessage = [errorDictionary valueForKeyPath:@"body.error.message"];
+            NSNumber *errorCode = [errorDictionary valueForKeyPath:@"body.error.code"];
+            NSString *tmpString = nil;
+            if ([errorCode intValue] == 104) tmpString = @"Please Log In to continue";
+            else tmpString = errorMessage;
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Facebook", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+            [alertView show];
+        });
+    }
+    else {
+        NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
+        [FBRequestConnection startWithGraphPath:graphAPIString completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+            [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+        }];
+    }
 }
 
 #pragma mark - Table view data source
@@ -375,47 +465,6 @@
     else return 44;
 }
 
-#pragma mark - Facebook Request Delegate Methods
-
-- (void)request:(FBRequest *)request didLoad:(id)result
-{
-    //Since the RSS file has been loaded, stop animating the activity indicator
-    [self.activityIndicator stopAnimating];
-    
-    //If there is a right bar button item, put it back
-    self.navigationItem.rightBarButtonItem = self.oldBarButtonItem;
-    
-    //if ([request.httpMethod isEqualToString:@"GET"])
-    //{
-        if ([result isKindOfClass:[NSDictionary class]])
-        {
-            self.fullCommentsDictionaryModel = result;
-            [self loadSocialMediaView];
-        }
-        //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
-    
-    //}
-    //else {
-        NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
-        [self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:graphAPIString];
-    //}
-    
-}
-
-- (void)requestLoading:(FBRequest *)request
-{
-    //When a facebook request starts, save the request
-    //so the delegate can be set to nill when the view disappears
-    
-    self.facebookRequest = request;
-    
-    [self.activityIndicator startAnimating];
-    
-    self.oldBarButtonItem = self.navigationItem.rightBarButtonItem;
-    //Set the right navigation bar button item to the activity indicator
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
-}
-
 #pragma mark - NSNotification Methods
 - (void)presentWebView:(NSNotification *) notification
 {
@@ -457,7 +506,7 @@
 {
     //This method will request the full comments array from the delegate and
     //the facebook class will call request:request didLoad:result when complete
-    [self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:[self.shortCommentsDictionaryModel objectForKey:@"id"]];
+    //[self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:[self.shortCommentsDictionaryModel objectForKey:@"id"]];
 }
 
 - (void)loadSocialMediaView
@@ -528,7 +577,16 @@
     //and post it to facebook using the graph API
     
     NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
-    [self.socialMediaDelegate SocialMediaDetailViewController:self postDataForFacebookGraphAPIString:graphAPIString withParameters:[[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil]];
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil];
+    //Set the right navigation bar button item to the activity indicator
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+    
+    //Since facebook had to log in, data will need to be requested, start the activity indicator
+    [self.activityIndicator startAnimating];
+    [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self processPostRequestWithConnection:connection withResults:result postError:error];
+    }];
+    //[self.socialMediaDelegate SocialMediaDetailViewController:self postDataForFacebookGraphAPIString:graphAPIString withParameters:[[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil]];
 }
 
 - (void)textViewDidCancel:(UITextView *)textView

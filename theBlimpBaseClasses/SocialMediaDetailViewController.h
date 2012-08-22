@@ -10,27 +10,14 @@
 #import <FacebookSDK/FacebookSDK.h>
 #import "TextEntryViewController.h"
 
+typedef void(^SocialMediaDetailCompletionBlock)(void);
+
 @class SocialMediaDetailViewController;
-
-@protocol SocialMediaDetailViewControllerDelegate <NSObject>
-- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender
-    dictionaryForFacebookGraphAPIString:(NSString *)facebookGraphAPIString;
-
-- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender 
-      postDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString 
-                         withParameters:(NSMutableDictionary *)params;
-
-- (void)SocialMediaDetailViewController:(SocialMediaDetailViewController *)sender 
-      deleteDataForFacebookGraphAPIString:(NSString *)facebookGraphAPIString 
-                         withParameters:(NSMutableDictionary *)params;
-
-@end
 
 @interface SocialMediaDetailViewController : UITableViewController <TextEntryDelegate>
 @property (weak, nonatomic) IBOutlet UIImageView *profilePictureImageView;
 @property (nonatomic, strong) NSDictionary *shortCommentsDictionaryModel;
 @property (nonatomic, strong) NSDictionary *fullCommentsDictionaryModel;
-@property (nonatomic, weak) id <SocialMediaDetailViewControllerDelegate> socialMediaDelegate;
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
 @property (nonatomic, strong) UIBarButtonItem *oldBarButtonItem;
