@@ -100,12 +100,16 @@
                 [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     self.logInOutButton.title = @"Log Out";
+                    self.navigationItem.rightBarButtonItem.enabled = YES;
                 });
             }];
         }];
     } else 
     {
-        self.logInOutButton.title = @"Login";
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.logInOutButton.title = @"Login";
+            self.navigationItem.rightBarButtonItem.enabled = NO;
+        });
     }
 }
 
@@ -174,6 +178,11 @@
     //save them to the user defaults
     self.userNameID = [defaults objectForKey:@"userNameID"];
     
+    // Check the session for a cached token to show the proper authenticated
+    // UI. However, since this is not user intitiated, do not show the login UX.
+    BOOL opened = [self openSessionWithAllowLoginUI:NO];
+    if (!opened) self.navigationItem.rightBarButtonItem.enabled = NO;
+    
     //initialize the activity indicator, set it to the center top of the view, and
     //start it animating
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
@@ -185,9 +194,6 @@
     //Set the right navigation bar button item to the activity indicator
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
     
-    // Check the session for a cached token to show the proper authenticated
-    // UI. However, since this is not user intitiated, do not show the login UX.
-    [self openSessionWithAllowLoginUI:NO];
 }
 
 - (void)viewWillAppear:(BOOL)animated
