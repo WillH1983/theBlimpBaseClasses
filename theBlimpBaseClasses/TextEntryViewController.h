@@ -8,8 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+enum TextEntryType {
+    TextEntryTypeComment,
+    TextEntryTypePost
+};
+
+typedef enum TextEntryType TextEntryType;
+
 @protocol TextEntryDelegate <NSObject>
-- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionaryForComment:(NSDictionary *)dictionary;
+- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionary:(NSDictionary *)dictionary forType:(TextEntryType)type;
 
 - (void)textViewDidCancel:(UITextView *)textView;
 @end
@@ -23,4 +30,5 @@
 @property (nonatomic, strong) NSDictionary *dictionaryForComment;
 @property (nonatomic, strong) NSString *submitButtonTitle;
 @property (nonatomic, strong) NSString *windowTitle;
+@property (nonatomic) TextEntryType type;
 @end

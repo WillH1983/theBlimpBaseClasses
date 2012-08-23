@@ -20,6 +20,7 @@
 @synthesize dictionaryForComment = _dictionaryForComment;
 @synthesize submitButtonTitle = _submitButtonTitle;
 @synthesize windowTitle = _windowTitle;
+@synthesize type = _type;
 
 - (void)textChanged:(NSNotification *) notification
 {
@@ -88,9 +89,9 @@
 
 - (IBAction)postButtonPushed:(id)sender 
 {
-    if ([self.textEntryDelegate respondsToSelector:@selector(textView:didFinishWithString:withDictionaryForComment:)])
+    if ([self.textEntryDelegate respondsToSelector:@selector(textView:didFinishWithString:withDictionary:forType:)])
     {
-        [self.textEntryDelegate textView:self.textView didFinishWithString:self.textView.text withDictionaryForComment:self.dictionaryForComment];
+        [self.textEntryDelegate textView:self.textView didFinishWithString:self.textView.text withDictionary:self.dictionaryForComment forType:self.type];
     }
     [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
 }

@@ -289,7 +289,7 @@
     UITableViewCell *cell = (UITableViewCell *)[contentView superview];
     NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
     NSDictionary *dictionaryData = [self.facebookArrayTableData objectAtIndex:indexPath.row];
-    [self performSegueWithIdentifier:@"textInput" sender:dictionaryData];
+    [self performSegueWithIdentifier:@"CommentOnPost" sender:dictionaryData];
 }
 
 - (void)likeButtonPressed:(id)sender
@@ -332,16 +332,24 @@
     
 }
 
-- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionaryForComment:(NSDictionary *)dictionary;
+- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionary:(NSDictionary *)dictionary forType:(TextEntryType)type
 {
-    NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [dictionary valueForKeyPath:@"id"]];
-    NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil];
-    
     //Set the right navigation bar button item to the activity indicator
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
     
     //Since facebook had to log in, data will need to be requested, start the activity indicator
     [self.activityIndicator startAnimating];
+    
+    NSString *graphAPIString = nil;
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil];
+    if (type == TextEntryTypeComment)
+    {
+        graphAPIString = [NSString stringWithFormat:@"%@/comments", [dictionary valueForKeyPath:@"id"]];
+    }
+    else if (type == TextEntryTypePost)
+    {
+        graphAPIString = [NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest];
+    }
     
     [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
         [self processPostRequestWithConnection:connection withResults:result postError:error];
@@ -676,12 +684,21 @@
             [segue.destinationViewController setFacebookPhotoObjectID:sender];
         }
     }
-    else if ([segue.identifier isEqualToString:@"textInput"])
+    else if ([segue.identifier isEqualToString:@"CommentOnPost"])
+    {
+        [segue.destinationViewController setTextEntryDelegate:self];
+        [segue.destinationViewController setDictionaryForComment:sender];
+        [segue.destinationViewController setSubmitButtonTitle:@"Send"];
+        [segue.destinationViewController setWindowTitle:@"Comment on Post"];
+        [segue.destinationViewController setType:TextEntryTypeComment];
+    }
+    else if ([segue.identifier isEqualToString:@"PostToPage"])
     {
         [segue.destinationViewController setTextEntryDelegate:self];
         [segue.destinationViewController setDictionaryForComment:sender];
         [segue.destinationViewController setSubmitButtonTitle:@"Post"];
-        [segue.destinationViewController setWindowTitle:@"Comment"];
+        [segue.destinationViewController setWindowTitle:[NSString stringWithFormat:@"Post to %@'s Page", self.appConfiguration.appName]];
+        [segue.destinationViewController setType:TextEntryTypePost];
     }
 }
 
@@ -801,29 +818,7 @@
         [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
     }];
 }
-
-#pragma mark - Facebook Initialization Method
-
-#pragma mark - Facebook Dialog Methods
-
-- (IBAction)postToWall:(id)sender 
-{
-    /*NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   self.appConfiguration.facebookID, @"app_id",
-                                   [NSString stringWithFormat:@"Post to %@'s Wall", self.appConfiguration.appName], @"description",
-                                   self.appConfiguration.facebookFeedToRequest, @"to",
-                                   nil];*/
-    
-    //[self.facebook dialog:@"feed" andParams:params andDelegate:self];
-}
-
-
 #pragma mark - Facebook Session Delegate Methods
-
-- (void)fbSessionInvalidated
-{
-    //Do nothing here for now, stubbed out to get rid of compiler warning
-}
 
 - (void)viewDidUnload {
     [self setTableView:nil];

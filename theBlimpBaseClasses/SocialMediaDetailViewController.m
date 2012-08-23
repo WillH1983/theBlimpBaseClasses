@@ -497,7 +497,8 @@
     {
         [segue.destinationViewController setTextEntryDelegate:self];
         [segue.destinationViewController setSubmitButtonTitle:@"Post"];
-        [segue.destinationViewController setWindowTitle:@"Comment"];
+        [segue.destinationViewController setWindowTitle:@"Comment on Post"];
+        [segue.destinationViewController setType:TextEntryTypeComment];
     }
 }
 
@@ -570,23 +571,26 @@
 
 #pragma mark - ImagoDeiTextEntryDelegate Method
 
-- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionaryForComment:(NSDictionary *)dictionary
+- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionary:(NSDictionary *)dictionary forType:(TextEntryType)type
 {
     //This function is called when the Comment View controller has data entered
     //and the view is closing.  The purpose of this function is to retireve the data
     //and post it to facebook using the graph API
     
-    NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
-    NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil];
-    //Set the right navigation bar button item to the activity indicator
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
-    
-    //Since facebook had to log in, data will need to be requested, start the activity indicator
-    [self.activityIndicator startAnimating];
-    [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
-        [self processPostRequestWithConnection:connection withResults:result postError:error];
-    }];
-    //[self.socialMediaDelegate SocialMediaDetailViewController:self postDataForFacebookGraphAPIString:graphAPIString withParameters:[[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil]];
+    if (type == TextEntryTypeComment)
+    {
+        NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil];
+        //Set the right navigation bar button item to the activity indicator
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+        
+        //Since facebook had to log in, data will need to be requested, start the activity indicator
+        [self.activityIndicator startAnimating];
+        [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+            [self processPostRequestWithConnection:connection withResults:result postError:error];
+        }];
+        //[self.socialMediaDelegate SocialMediaDetailViewController:self postDataForFacebookGraphAPIString:graphAPIString withParameters:[[NSMutableDictionary alloc] initWithObjectsAndKeys:string, @"message", nil]]; 
+    }
 }
 
 - (void)textViewDidCancel:(UITextView *)textView
