@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PullRefreshTableViewController.h"
 
 enum TWRequestType {
     TWRequestTypeRetweet,
@@ -18,7 +19,7 @@ enum TWRequestType {
 
 typedef enum TWRequestType TWRequestType;
 
-@interface TwitterTableViewController : UITableViewController
+@interface TwitterTableViewController : PullRefreshTableViewController
 
 @property (nonatomic, strong) NSMutableArray *twitterTableData;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;

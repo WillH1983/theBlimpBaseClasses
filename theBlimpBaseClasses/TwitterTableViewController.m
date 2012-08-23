@@ -328,6 +328,9 @@
             // Inspect the contents of jsonError
             NSLog(@"%@", jsonError);
         }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+        });
     }]; 
 }
 
@@ -453,8 +456,8 @@
     retweetButton.frame = CGRectMake(retweetButton.frame.origin.x, retweetButton.frame.origin.y + heightChange, retweetButton.frame.size.width, retweetButton.frame.size.height);
     viewConversationButton.frame = CGRectMake(viewConversationButton.frame.origin.x, viewConversationButton.frame.origin.y + heightChange, viewConversationButton.frame.size.width, viewConversationButton.frame.size.height);
     replyButton.frame = CGRectMake(replyButton.frame.origin.x, replyButton.frame.origin.y + heightChange, replyButton.frame.size.width, replyButton.frame.size.height);
-    NSDate *date = [[NSDate alloc] initTwitterDateFormatWithString:[tweetDictionary valueForKeyPath:TWITTER_POSTED_DATE]];
-    postedDate.text = date.socialDate;
+    NSDate *twitterDate = [[NSDate alloc] initTwitterDateFormatWithString:[tweetDictionary valueForKeyPath:TWITTER_POSTED_DATE]];
+    postedDate.text = twitterDate.socialDate;
     
     return cell;
 }
@@ -545,6 +548,11 @@
 - (void)textViewDidCancel:(UITextView *)textView
 {
     [self.tableView reloadData];
+}
+
+- (void)refresh 
+{
+    [self loadTwitterData];
 }
 
 @end

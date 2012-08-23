@@ -9,12 +9,13 @@
 #import <UIKit/UIKit.h>
 #import <FacebookSDK/FacebookSDK.h>
 #import "TextEntryViewController.h"
+#import "PullRefreshTableViewController.h"
 
 typedef void(^SocialMediaDetailCompletionBlock)(void);
 
 @class SocialMediaDetailViewController;
 
-@interface SocialMediaDetailViewController : UITableViewController <TextEntryDelegate>
+@interface SocialMediaDetailViewController : PullRefreshTableViewController <TextEntryDelegate>
 @property (weak, nonatomic) IBOutlet UIImageView *profilePictureImageView;
 @property (nonatomic, strong) NSDictionary *shortCommentsDictionaryModel;
 @property (nonatomic, strong) NSDictionary *fullCommentsDictionaryModel;

@@ -10,8 +10,9 @@
 #import <FacebookSDK/FacebookSDK.h>
 #import "SocialMediaDetailViewController.h"
 #import "TextEntryViewController.h"
+#import "PullRefreshTableViewController.h"
 
-@interface FaceBookTableViewController : UITableViewController <TextEntryDelegate>
+@interface FaceBookTableViewController : PullRefreshTableViewController <TextEntryDelegate>
 
 @property (nonatomic, strong) NSArray *facebookArrayTableData;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;

@@ -128,6 +128,9 @@
             // Inspect the contents of jsonError
             NSLog(@"%@", jsonError);
         }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+        });
     }]; 
 }
 

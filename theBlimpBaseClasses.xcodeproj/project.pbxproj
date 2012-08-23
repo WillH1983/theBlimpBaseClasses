@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE01FE3415E5BE2F00E92654 /* PullRefreshTableViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = BE01FE3215E5BE2F00E92654 /* PullRefreshTableViewController.h */; };
+		BE01FE3515E5BE2F00E92654 /* PullRefreshTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BE01FE3315E5BE2F00E92654 /* PullRefreshTableViewController.m */; };
+		BE01FE3815E5BEA200E92654 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE01FE3715E5BEA200E92654 /* QuartzCore.framework */; };
 		BE145D7415E3536A005793EE /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE145D7315E3536A005793EE /* FacebookSDK.framework */; };
 		BE26015715D893C1000F720D /* NSDate+Generic.h in Headers */ = {isa = PBXBuildFile; fileRef = BE26015515D893C1000F720D /* NSDate+Generic.h */; };
 		BE26015815D893C1000F720D /* NSDate+Generic.m in Sources */ = {isa = PBXBuildFile; fileRef = BE26015615D893C1000F720D /* NSDate+Generic.m */; };
@@ -57,6 +60,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BE01FE3215E5BE2F00E92654 /* PullRefreshTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullRefreshTableViewController.h; sourceTree = "<group>"; };
+		BE01FE3315E5BE2F00E92654 /* PullRefreshTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullRefreshTableViewController.m; sourceTree = "<group>"; };
+		BE01FE3715E5BEA200E92654 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		BE01FE3D15E5BF9B00E92654 /* arrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arrow.png; sourceTree = "<group>"; };
 		BE145D7315E3536A005793EE /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = "../facebook-ios-sdk/build/FacebookSDK.framework"; sourceTree = "<group>"; };
 		BE145D7515E35375005793EE /* FacebookSDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = FacebookSDKResources.bundle; path = "../facebook-ios-sdk/build/FacebookSDK.framework/Versions/A/Resources/FacebookSDKResources.bundle"; sourceTree = "<group>"; };
 		BE26015515D893C1000F720D /* NSDate+Generic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Generic.h"; sourceTree = "<group>"; };
@@ -105,6 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE01FE3815E5BEA200E92654 /* QuartzCore.framework in Frameworks */,
 				BEEB0AB715D9E85B0026DD5E /* Accounts.framework in Frameworks */,
 				BEEB0AB515D9E7CE0026DD5E /* Twitter.framework in Frameworks */,
 				BEF4248415D6E2DF00C647BC /* Foundation.framework in Frameworks */,
@@ -170,6 +178,7 @@
 		BEF4248215D6E2DF00C647BC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BE01FE3715E5BEA200E92654 /* QuartzCore.framework */,
 				BE145D7515E35375005793EE /* FacebookSDKResources.bundle */,
 				BE145D7315E3536A005793EE /* FacebookSDK.framework */,
 				BEEB0AB615D9E85B0026DD5E /* Accounts.framework */,
@@ -205,6 +214,9 @@
 				BEF424CE15D6E35500C647BC /* WebViewController.m */,
 				BEF424CF15D6E35500C647BC /* XMLReader.h */,
 				BEF424D015D6E35500C647BC /* XMLReader.m */,
+				BE01FE3215E5BE2F00E92654 /* PullRefreshTableViewController.h */,
+				BE01FE3315E5BE2F00E92654 /* PullRefreshTableViewController.m */,
+				BE01FE3D15E5BF9B00E92654 /* arrow.png */,
 				BEF4248615D6E2DF00C647BC /* Supporting Files */,
 			);
 			path = theBlimpBaseClasses;
@@ -258,6 +270,7 @@
 				BEF424F215D6E35500C647BC /* WebViewController.h in Headers */,
 				BEF424F415D6E35500C647BC /* XMLReader.h in Headers */,
 				BE2AC9D815E05591001DBCA2 /* TwitterConversationTableViewController.h in Headers */,
+				BE01FE3415E5BE2F00E92654 /* PullRefreshTableViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -371,6 +384,7 @@
 				BEF424F515D6E35500C647BC /* XMLReader.m in Sources */,
 				BE26015815D893C1000F720D /* NSDate+Generic.m in Sources */,
 				BE2AC9D915E05591001DBCA2 /* TwitterConversationTableViewController.m in Sources */,
+				BE01FE3515E5BE2F00E92654 /* PullRefreshTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

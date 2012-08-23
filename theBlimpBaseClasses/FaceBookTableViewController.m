@@ -416,8 +416,8 @@
     
     //Pull the main and detail text label out of the corresponding dictionary
     NSString *mainTextLabel = [dictionaryForCell valueForKeyPath:[self keyForMainCellLabelText]];
-    NSDate *date = [[NSDate alloc] initFacebookDateFormatWithString:[dictionaryForCell valueForKey:@"created_time"]];
-    datePosted.text = date.socialDate;
+    NSDate *facebookDate = [[NSDate alloc] initFacebookDateFormatWithString:[dictionaryForCell valueForKey:@"created_time"]];
+    datePosted.text = facebookDate.socialDate;
     
     if ([typeOfPost isEqualToString:@"link"])
     {
@@ -740,7 +740,7 @@
         //If an oldbutton was removed from the right bar button spot, put it back
         self.navigationItem.rightBarButtonItem = self.oldBarButtonItem;
         
-        //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+        [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
     });
 }
 
@@ -830,6 +830,10 @@
     //This method will request the full comments array from the delegate and
     //the facebook class will call request:request didLoad:result when complete
     //[self.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] andDelegate:self];
+    
+    [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+    }];
 }
 
 - (void) presentWebView:(NSNotification *) notification

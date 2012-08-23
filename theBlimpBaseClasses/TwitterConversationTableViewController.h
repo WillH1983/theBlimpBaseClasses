@@ -7,6 +7,7 @@
 //
 
 #import "TwitterTableViewController.h"
+#import "PullRefreshTableViewController.h"
 
 @interface TwitterConversationTableViewController : TwitterTableViewController
 

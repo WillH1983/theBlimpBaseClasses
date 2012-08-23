@@ -163,7 +163,7 @@
         //If an oldbutton was removed from the right bar button spot, put it back
         self.navigationItem.rightBarButtonItem = self.oldBarButtonItem;
         
-        //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+        [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
     });
 }
 
@@ -281,7 +281,7 @@
     NSString *mainTextLabel = [dictionaryForCell valueForKeyPath:@"message"];
     NSString *detailTextLabel = [dictionaryForCell valueForKeyPath:@"from.name"];
 
-    NSDate *date = [[NSDate alloc] initFacebookDateFormatWithString:[dictionaryForCell valueForKey:@"created_time"]];
+    NSDate *socialMediaDate = [[NSDate alloc] initFacebookDateFormatWithString:[dictionaryForCell valueForKey:@"created_time"]];
     
     NSNumber *user_likes = [dictionaryForCell valueForKeyPath:@"user_likes"];
     if ([user_likes boolValue])
@@ -296,7 +296,7 @@
     
     comment.text = mainTextLabel;
     name.text = detailTextLabel;
-    datePosted.text = date.socialDate;
+    datePosted.text = socialMediaDate.socialDate;
     
     [comment resizeTextViewForWidth:self.tableView.frame.size.width - comment.frame.origin.x - 30];
     CGFloat heightChange = comment.frame.size.height - oldSizeHeight;
@@ -384,7 +384,7 @@
         NSString *typeOfPost = [self.shortCommentsDictionaryModel valueForKeyPath:@"type"];
         NSString *commentString = [self.shortCommentsDictionaryModel valueForKeyPath:@"message"];
         NSString *dateString = [self.shortCommentsDictionaryModel valueForKeyPath:@"created_time"];
-        NSDate *date = [[NSDate alloc] initFacebookDateFormatWithString:dateString];
+        NSDate *socialMediaDate = [[NSDate alloc] initFacebookDateFormatWithString:dateString];
         
         if ([typeOfPost isEqualToString:@"link"])
         {
@@ -402,7 +402,7 @@
         
         name.text = [self.shortCommentsDictionaryModel valueForKeyPath:@"from.name"];
         comment.text = commentString;
-        dateLabel.text = date.socialDate;
+        dateLabel.text = socialMediaDate.socialDate;
         
         [comment resizeTextViewForWidth:self.tableView.frame.size.width - comment.frame.origin.x - 10];
         dispatch_queue_t downloadQueue = dispatch_queue_create("Profile Image Downloader", NULL);
@@ -508,6 +508,13 @@
     //This method will request the full comments array from the delegate and
     //the facebook class will call request:request didLoad:result when complete
     //[self.socialMediaDelegate SocialMediaDetailViewController:self dictionaryForFacebookGraphAPIString:[self.shortCommentsDictionaryModel objectForKey:@"id"]];
+    NSString *graphAPIString = [NSString stringWithFormat:@"%@/comments", [self.shortCommentsDictionaryModel valueForKeyPath:@"id"]];
+    
+    //When the SocialMediaDetailViewController needs further information from
+    //the facebook class, this method is called
+    [FBRequestConnection startWithGraphPath:graphAPIString completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
+    }];
 }
 
 - (void)loadSocialMediaView
