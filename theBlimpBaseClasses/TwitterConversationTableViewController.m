@@ -12,11 +12,12 @@
 #import <Accounts/Accounts.h>
 
 @interface TwitterConversationTableViewController ()
-
+@property (nonatomic, strong) NSMutableArray *workingTwitterArray;
 @end
 
 @implementation TwitterConversationTableViewController
 @synthesize tweetForConversation = _tweetForConversation;
+@synthesize workingTwitterArray = _workingTwitterArray;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -30,6 +31,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.workingTwitterArray = [[NSMutableArray alloc] init];
 	// Do any additional setup after loading the view.
 }
 
@@ -95,7 +97,7 @@
             {
                 if ([timeline isKindOfClass:[NSDictionary class]])
                 {
-                    [self.twitterTableData insertObject:timeline atIndex:0];
+                    [self.workingTwitterArray insertObject:timeline atIndex:0];
                     id tweetId = [timeline valueForKey:TWEET_IN_REPLY_ID];
                     if (tweetId != [NSNull null])
                     {
@@ -106,6 +108,8 @@
                     else
                     {
                         dispatch_async(dispatch_get_main_queue(), ^{
+                            self.twitterTableData = self.workingTwitterArray;
+                            self.workingTwitterArray = [[NSMutableArray alloc] init];
                             [self.tableView reloadData];
                             [self.activityIndicator stopAnimating];
                         });

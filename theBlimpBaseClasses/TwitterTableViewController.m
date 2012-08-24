@@ -407,6 +407,7 @@
     static NSString *CellIdentifier = @"twitterCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
+    UIImageView *profileImage = (UIImageView *)[cell.contentView viewWithTag:1];
     UILabel *postedBy = (UILabel *)[cell.contentView viewWithTag:2];
     UITextView *tweetText = (UITextView *)[cell.contentView viewWithTag:3];
     UILabel *twitterScreenName = (UILabel *)[cell.contentView viewWithTag:4];
@@ -442,6 +443,8 @@
         viewConversationButton.titleLabel.text = nil;
         [viewConversationButton removeTarget:self action:@selector(viewConversationButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     }
+    
+    profileImage.image = nil;
     
     
     postedBy.text = [tweetDictionary valueForKeyPath:TWITTER_NAME];
