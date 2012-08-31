@@ -83,6 +83,11 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+}
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return YES;
@@ -104,7 +109,10 @@
 {
     
     [self.activityIndicator startAnimating];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    if ([UIApplication sharedApplication].isNetworkActivityIndicatorVisible == NO)
+    {
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    }
     self.navigationBar.topItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
 }
 

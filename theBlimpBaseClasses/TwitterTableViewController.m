@@ -81,32 +81,6 @@
 
 - (void)loadTwitterData
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-        self.activityIndicator.hidesWhenStopped = YES;
-        [self.activityIndicator startAnimating];
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
-    });
-    
-    //  First, we create a dictionary to hold our request parameters
-    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-    [params setObject:self.appConfiguration.twitterUserNameToRequest forKey:@"screen_name"];
-    [params setObject:@"20" forKey:@"count"];
-    [params setObject:@"1" forKey:@"include_rts"];
-    
-    //  Next, we create an URL that points to the target endpoint
-    NSURL *url = [NSURL URLWithString:@"http://api.twitter.com/1/statuses/user_timeline.json"];
-    
-    [self twitterGetRequestWithURL:url twitterParameters:params withRequestType:TWRequestTypeGetTimeline];
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    
-    id appDelegate = (id)[[UIApplication sharedApplication] delegate];
-    self.appConfiguration = [appDelegate appConfiguration];
-    
     ACAccountStore *store = [[ACAccountStore alloc] init];
     ACAccountType *twitterAccountType = [store accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
     
@@ -123,7 +97,23 @@
             if ([twitterAccounts count] > 0)
             {
                 self.twitterAccount = [twitterAccounts objectAtIndex:0];
-                [self loadTwitterData];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+                    self.activityIndicator.hidesWhenStopped = YES;
+                    [self.activityIndicator startAnimating];
+                    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+                });
+                
+                //  First, we create a dictionary to hold our request parameters
+                NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+                [params setObject:self.appConfiguration.twitterUserNameToRequest forKey:@"screen_name"];
+                [params setObject:@"20" forKey:@"count"];
+                [params setObject:@"1" forKey:@"include_rts"];
+                
+                //  Next, we create an URL that points to the target endpoint
+                NSURL *url = [NSURL URLWithString:@"http://api.twitter.com/1/statuses/user_timeline.json"];
+                
+                [self twitterGetRequestWithURL:url twitterParameters:params withRequestType:TWRequestTypeGetTimeline];
             }
             else
             {
@@ -131,11 +121,23 @@
                     NSString *tmpString = @"Please create a Twitter Account in your iOS settings to continue";
                     UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Twitter", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
                     [alertView show];
+                    [self.activityIndicator stopAnimating];
+                    [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
                 });
             }
             
         }
     }];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    id appDelegate = (id)[[UIApplication sharedApplication] delegate];
+    self.appConfiguration = [appDelegate appConfiguration];
+    
+    [self loadTwitterData];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -207,6 +209,8 @@
                                                             cancelButtonTitle:@"Okay" 
                                                             otherButtonTitles: nil];
                 [alertView show];
+                [self.activityIndicator stopAnimating];
+                [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
             });
         }
         else 
@@ -229,6 +233,7 @@
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self.tableView reloadData];
                         [self.activityIndicator stopAnimating];
+                        [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
                     });
                 }
             }
@@ -251,6 +256,7 @@
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self.tableView reloadData];
                     [self.activityIndicator stopAnimating];
+                    [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
                 });
             }
             else if (requestType == TWRequestTypeTweet)
@@ -301,6 +307,8 @@
                                                               cancelButtonTitle:@"Okay" 
                                                               otherButtonTitles: nil];
                     [alertView show];
+                    [self.activityIndicator stopAnimating];
+                    [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
                 });
             }
             else if (requestType == TWRequestTypeGetTimeline)
@@ -310,6 +318,7 @@
                     dispatch_async(dispatch_get_main_queue(), ^{
                         self.twitterTableData = [timeline mutableCopy];
                         [self.activityIndicator stopAnimating];
+                        [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
                     });
                 }
             }

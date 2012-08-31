@@ -91,6 +91,8 @@
                                                               cancelButtonTitle:@"Okay" 
                                                               otherButtonTitles: nil];
                     [alertView show];
+                    [self.activityIndicator stopAnimating];
+                    [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
                 });
             }
             else if (requestType == TWRequestTypeGetTweetsForConversation)
@@ -112,6 +114,7 @@
                             self.workingTwitterArray = [[NSMutableArray alloc] init];
                             [self.tableView reloadData];
                             [self.activityIndicator stopAnimating];
+                            [self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
                         });
                     }
                     
