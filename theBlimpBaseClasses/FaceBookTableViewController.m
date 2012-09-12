@@ -703,7 +703,7 @@
         [segue.destinationViewController setTextEntryDelegate:self];
         [segue.destinationViewController setDictionaryForComment:sender];
         [segue.destinationViewController setSubmitButtonTitle:@"Post"];
-        [segue.destinationViewController setWindowTitle:[NSString stringWithFormat:@"Post to %@'s Page", self.appConfiguration.appName]];
+        [segue.destinationViewController setWindowTitle:[NSString stringWithFormat:@"Post to Facebook", self.appConfiguration.appName]];
         [segue.destinationViewController setType:TextEntryTypePost];
     }
 }
