@@ -542,7 +542,7 @@
     }
 }
 
-- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionary:(NSDictionary *)dictionary forType:(TextEntryType)type
+- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionary:(NSDictionary *)dictionary andImage:(UIImage *)image forType:(TextEntryType)type
 {
     [self.activityIndicator startAnimating];
     

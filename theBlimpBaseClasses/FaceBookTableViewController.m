@@ -21,6 +21,8 @@
 @property (nonatomic, strong) UITableViewCell *defaultFacebookCell;
 @property (nonatomic, strong) UITableViewCell *facebookPhotoCell;
 
+- (void)processPostPhotoRequestWithConnection:(FBRequestConnection *)connection withMessage:(NSString *)message withResults:(id)result postError:(NSError *)error;
+
 @end
 
 @implementation FaceBookTableViewController
@@ -316,7 +318,7 @@
         //Since facebook had to log in, data will need to be requested, start the activity indicator
         [self.activityIndicator startAnimating];
         
-        [FBRequestConnection startWithGraphPath:graphAPIString parameters:[[NSMutableDictionary alloc] init] HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [FBRequestConnection startWithGraphPath:graphAPIString parameters:nil HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
             NSLog(@"%@", result);
             [self processPostRequestWithConnection:connection withResults:result postError:error];
         }];
@@ -338,7 +340,7 @@
     
 }
 
-- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionary:(NSDictionary *)dictionary forType:(TextEntryType)type
+- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionary:(NSDictionary *)dictionary andImage:(UIImage *)image forType:(TextEntryType)type
 {
     //Set the right navigation bar button item to the activity indicator
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
@@ -351,15 +353,33 @@
     if (type == TextEntryTypeComment)
     {
         graphAPIString = [NSString stringWithFormat:@"%@/comments", [dictionary valueForKeyPath:@"id"]];
+        [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+            [self processPostRequestWithConnection:connection withResults:result postError:error];
+        }];
     }
     else if (type == TextEntryTypePost)
     {
-        graphAPIString = [NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest];
+        if (image)
+        {
+            graphAPIString = [NSString stringWithFormat:@"%@/photos", self.appConfiguration.facebookFeedToRequest];
+            [params setObject:image forKey:@"source"];
+            [params setObject:@"true" forKey:@"no_story"];
+            [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+                NSLog(@"%@", result);
+                [self processPostPhotoRequestWithConnection:connection withMessage:string withResults:result postError:error];
+            }];
+        }
+        else
+        {
+            graphAPIString = [NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest];
+            [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+                [self processPostRequestWithConnection:connection withResults:result postError:error];
+            }];
+        }
+        
     }
     
-    [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
-        [self processPostRequestWithConnection:connection withResults:result postError:error];
-    }];
+    
 }
 
 - (void)textViewDidCancel:(UITextView *)textView
@@ -541,21 +561,40 @@
     __block NSData *profilePictureData = [self.photoDictionary objectForKey:profileFromId];
     
     NSString *urlStringForProfilePicture = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture/type=small", profileFromId];
-    NSString *urlStringForPicture = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture?type=normal", pictureID];
+    
+    if (!picture)
+    {
+        if (pictureID)
+        {
+            [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@", pictureID] completionHandler:^(FBRequestConnection *connection, id result, NSError  *error) {
+                NSURL *url = [[NSURL alloc] initWithString:[result valueForKey:@"source"]];
+                picture = [NSData dataWithContentsOfURL:url];
+                if (picture) [self.photoDictionary setObject:picture forKey:pictureID];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSArray *tmpArray = [self.tableView indexPathsForVisibleRows];
+                    if ([tmpArray containsObject:indexPath])
+                    {
+                        UIButton *buttonImage = (UIButton *)[cell.contentView viewWithTag:6];
+                        UIImage *image = [UIImage imageWithData:picture];
+                        buttonImage.contentMode = UIViewContentModeScaleAspectFit;
+                        UIImage *scaledImage = [self getScaledImage:image insideButton:buttonImage];
+                        [buttonImage setImage:scaledImage forState:UIControlStateNormal];
+                    }
+                });
+            }];
+            
+        }
+    }
+    else {
+        UIButton *buttonImage = (UIButton *)[cell.contentView viewWithTag:6];
+        UIImage *image = [UIImage imageWithData:picture];
+        buttonImage.contentMode = UIViewContentModeScaleAspectFit;
+        UIImage *scaledImage = [self getScaledImage:image insideButton:buttonImage];
+        [buttonImage setImage:scaledImage forState:UIControlStateNormal];
+    }
     
     dispatch_queue_t downloadQueue = dispatch_queue_create("Profile Image Downloader", NULL);
     dispatch_async(downloadQueue, ^{
-        
-        if (!picture)
-        {
-            if (pictureID)
-            {
-                NSURL *url = [[NSURL alloc] initWithString:urlStringForPicture];
-                picture = [NSData dataWithContentsOfURL:url];
-                if (picture) [self.photoDictionary setObject:picture forKey:pictureID];
-                NSLog(@"Picture");
-            }
-        }
         
         if (!profilePictureData)
         {
@@ -572,12 +611,6 @@
             NSArray *tmpArray = [self.tableView indexPathsForVisibleRows];
             if ([tmpArray containsObject:indexPath])
             {
-                UIButton *buttonImage = (UIButton *)[cell.contentView viewWithTag:6];
-                UIImage *image = [UIImage imageWithData:picture];
-                buttonImage.contentMode = UIViewContentModeScaleAspectFit;
-                UIImage *scaledImage = [self getScaledImage:image insideButton:buttonImage];
-                [buttonImage setImage:scaledImage forState:UIControlStateNormal];
-                
                 UIImageView *profileImageView = (UIImageView *)[cell.contentView viewWithTag:1];
                 [profileImageView setImage:[UIImage imageWithData:profilePictureData]];
             }
@@ -703,32 +736,17 @@
         [segue.destinationViewController setTextEntryDelegate:self];
         [segue.destinationViewController setDictionaryForComment:sender];
         [segue.destinationViewController setSubmitButtonTitle:@"Post"];
-        [segue.destinationViewController setWindowTitle:[NSString stringWithFormat:@"Post to Facebook", self.appConfiguration.appName]];
+        [segue.destinationViewController setWindowTitle:[NSString stringWithFormat:@"Facebook", self.appConfiguration.appName]];
         [segue.destinationViewController setType:TextEntryTypePost];
+        [segue.destinationViewController setSupportPicture:YES];
     }
 }
 
 - (void)processGetFeedRequestWithConnection:(FBRequestConnection *)connection withResults:(id)result postError:(NSError *)error
 {
     
-    if (error)
-    {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            //Since the request has been recieved, and parsed, stop the Activity Indicator
-            [self.activityIndicator stopAnimating];
-            self.facebookArrayTableData = nil;
-            [self.tableView reloadData];
-            //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
-            NSDictionary *errorDictionary = [[error userInfo] valueForKey:@"com.facebook.sdk:ParsedJSONResponseKey"];
-            NSString *errorMessage = [errorDictionary valueForKeyPath:@"body.error.message"];
-            NSNumber *errorCode = [errorDictionary valueForKeyPath:@"body.error.code"];
-            NSString *tmpString = nil;
-            if ([errorCode intValue] == 104) tmpString = @"Please Log In to continue";
-            else tmpString = errorMessage;
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Facebook", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
-            [alertView show];
-        });
-    }
+    if (error) [self determineCauseOfError:error];
+
     //Verify the result from the facebook class is actually a dictionary
     else if ([result isKindOfClass:[NSDictionary class]])
     {
@@ -750,31 +768,55 @@
     });
 }
 
+- (void)determineCauseOfError:(NSError *)error
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //Since the request has been recieved, and parsed, stop the Activity Indicator
+        [self.activityIndicator stopAnimating];
+        self.facebookArrayTableData = nil;
+        [self.tableView reloadData];
+        //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
+        NSDictionary *errorDictionary = [[error userInfo] valueForKey:@"com.facebook.sdk:ParsedJSONResponseKey"];
+        NSString *errorMessage = [errorDictionary valueForKeyPath:@"body.error.message"];
+        NSNumber *errorCode = [errorDictionary valueForKeyPath:@"body.error.code"];
+        NSString *tmpString = nil;
+        if ([errorCode intValue] == 104) tmpString = @"Please Log In to continue";
+        else tmpString = errorMessage;
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Facebook", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+        [alertView show];
+    });
+}
+
 - (void)processPostRequestWithConnection:(FBRequestConnection *)connection withResults:(id)result postError:(NSError *)error
 {
-    if (error)
-    {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            //Since the request has been recieved, and parsed, stop the Activity Indicator
-            [self.activityIndicator stopAnimating];
-            self.facebookArrayTableData = nil;
-            [self.tableView reloadData];
-            //[self performSelector:@selector(stopLoading) withObject:nil afterDelay:0];
-            NSDictionary *errorDictionary = [[error userInfo] valueForKey:@"com.facebook.sdk:ParsedJSONResponseKey"];
-            NSString *errorMessage = [errorDictionary valueForKeyPath:@"body.error.message"];
-            NSNumber *errorCode = [errorDictionary valueForKeyPath:@"body.error.code"];
-            NSString *tmpString = nil;
-            if ([errorCode intValue] == 104) tmpString = @"Please Log In to continue";
-            else tmpString = errorMessage;
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[[NSString alloc] initWithFormat:@"%@ - Facebook", self.appConfiguration.appName] message:tmpString delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles: nil];
-            [alertView show];
-        });
-    }
+    if (error) [self determineCauseOfError:error];
     else {
         [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest] completionHandler:^(FBRequestConnection *connection, id result, NSError  *error) {
             [self processGetFeedRequestWithConnection:connection withResults:result postError:error];
         }];
     }
+}
+
+- (void)processPostPhotoRequestWithConnection:(FBRequestConnection *)connection withMessage:(NSString *)message withResults:(id)result postError:(NSError *)error
+{
+    if (error) [self determineCauseOfError:error];
+    else 
+    {
+        NSString *facebookPhotoID = [result valueForKey:@"id"];
+        [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@", facebookPhotoID] completionHandler:^(FBRequestConnection *connection, id result2, NSError  *error) {
+            if (error) [self determineCauseOfError:error];
+            else 
+            {
+                NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[result2 valueForKey:@"link"], @"link", message, @"message" ,nil];
+                NSString *graphAPIString = [NSString stringWithFormat:@"%@/feed", self.appConfiguration.facebookFeedToRequest];
+                [FBRequestConnection startWithGraphPath:graphAPIString parameters:params HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+                    if (error) [self determineCauseOfError:error];
+                    else [self processPostRequestWithConnection:connection withResults:result postError:error];
+                }];
+            }
+        }];
+    }
+    
 }
 
 #pragma mark - SocialMediaDetailView datasource
@@ -888,7 +930,7 @@
  */
 - (BOOL)openSessionWithAllowLoginUI:(BOOL)allowLoginUI 
 {
-    NSArray *params = [[NSArray alloc] initWithObjects:@"publish_stream", nil];
+    NSArray *params = [[NSArray alloc] initWithObjects:@"publish_stream", @"user_photos", nil];
     BOOL open = [FBSession openActiveSessionWithPermissions:params allowLoginUI:allowLoginUI completionHandler:^(FBSession *session, FBSessionState state, NSError *error) {
         [self sessionStateChanged:session state:state error:error];
     }];

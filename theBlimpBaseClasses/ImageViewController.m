@@ -7,6 +7,7 @@
 //
 
 #import "ImageViewController.h"
+#import <FacebookSDK/FacebookSDK.h>
 
 @interface ImageViewController ()
 
@@ -36,20 +37,15 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    
-    NSString *urlStringForProfile = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture", self.facebookPhotoObjectID];
-    
-    NSURL *urlForProfile = [NSURL URLWithString:urlStringForProfile];
     UIBarButtonItem *oldBarButtonItem = self.navigationBar.topItem.leftBarButtonItem;
     UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     [spinner startAnimating];
     UIBarButtonItem *spinnerButton = [[UIBarButtonItem alloc] initWithCustomView:spinner];
     self.navigationBar.topItem.rightBarButtonItem = spinnerButton;
-
     
-    dispatch_queue_t downloadQueue2 = dispatch_queue_create("downloader", NULL);
-    dispatch_async(downloadQueue2, ^{
-        UIImage *tmpImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:urlForProfile]];
+    [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@", self.facebookPhotoObjectID] completionHandler:^(FBRequestConnection *connection, id result, NSError  *error) {
+        NSURL *urlStringForProfile = [[NSURL alloc] initWithString:[result valueForKey:@"source"]];
+        UIImage *tmpImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:urlStringForProfile]];
         dispatch_async(dispatch_get_main_queue(), ^{
             self.imageForImageView = tmpImage;
             self.scrollView.zoomScale = 1;
@@ -61,8 +57,7 @@
             self.navigationBar.topItem.leftBarButtonItem = oldBarButtonItem;
             [spinner stopAnimating];
         });
-    });
-    dispatch_release(downloadQueue2);
+    }];
 }
 
 - (void)viewDidUnload

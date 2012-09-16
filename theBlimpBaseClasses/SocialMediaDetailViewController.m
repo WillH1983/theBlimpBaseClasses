@@ -578,7 +578,7 @@
 
 #pragma mark - ImagoDeiTextEntryDelegate Method
 
-- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionary:(NSDictionary *)dictionary forType:(TextEntryType)type
+- (void)textView:(UITextView *)sender didFinishWithString:(NSString *)string withDictionary:(NSDictionary *)dictionary andImage:(UIImage *)image forType:(TextEntryType)type
 {
     //This function is called when the Comment View controller has data entered
     //and the view is closing.  The purpose of this function is to retireve the data
