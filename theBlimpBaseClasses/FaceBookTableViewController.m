@@ -554,44 +554,48 @@
     NSDictionary *tmpDictionary = [self.facebookArrayTableData objectAtIndex:[indexPath row]];
     NSString *pictureID = [tmpDictionary valueForKeyPath:@"object_id"];
     NSString *profileFromId = [tmpDictionary valueForKeyPath:@"from.id"];
+    NSString *typeOfPost = [tmpDictionary valueForKeyPath:@"type"];
     
     //if (![type isEqualToString:@"photo"]) return;
     
-    __block NSData *picture = [self.photoDictionary objectForKey:pictureID];
-    __block NSData *profilePictureData = [self.photoDictionary objectForKey:profileFromId];
-    
-    NSString *urlStringForProfilePicture = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture/type=small", profileFromId];
-    
-    if (!picture)
+    if ([typeOfPost isEqualToString:@"photo"])
     {
-        if (pictureID)
+        __block NSData *picture = [self.photoDictionary objectForKey:pictureID];
+        
+        if (!picture)
         {
-            [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@", pictureID] completionHandler:^(FBRequestConnection *connection, id result, NSError  *error) {
-                NSURL *url = [[NSURL alloc] initWithString:[result valueForKey:@"source"]];
-                picture = [NSData dataWithContentsOfURL:url];
-                if (picture) [self.photoDictionary setObject:picture forKey:pictureID];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSArray *tmpArray = [self.tableView indexPathsForVisibleRows];
-                    if ([tmpArray containsObject:indexPath])
-                    {
-                        UIButton *buttonImage = (UIButton *)[cell.contentView viewWithTag:6];
-                        UIImage *image = [UIImage imageWithData:picture];
-                        buttonImage.contentMode = UIViewContentModeScaleAspectFit;
-                        UIImage *scaledImage = [self getScaledImage:image insideButton:buttonImage];
-                        [buttonImage setImage:scaledImage forState:UIControlStateNormal];
-                    }
-                });
-            }];
-            
+            if (pictureID)
+            {
+                [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@", pictureID] completionHandler:^(FBRequestConnection *connection, id result, NSError  *error) {
+                    NSURL *url = [[NSURL alloc] initWithString:[result valueForKey:@"source"]];
+                    picture = [NSData dataWithContentsOfURL:url];
+                    if (picture) [self.photoDictionary setObject:picture forKey:pictureID];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        NSArray *tmpArray = [self.tableView indexPathsForVisibleRows];
+                        if ([tmpArray containsObject:indexPath])
+                        {
+                            UIButton *buttonImage = (UIButton *)[cell.contentView viewWithTag:6];
+                            UIImage *image = [UIImage imageWithData:picture];
+                            buttonImage.contentMode = UIViewContentModeScaleAspectFit;
+                            UIImage *scaledImage = [self getScaledImage:image insideButton:buttonImage];
+                            [buttonImage setImage:scaledImage forState:UIControlStateNormal];
+                        }
+                    });
+                }];
+                
+            }
+        }
+        else {
+            UIButton *buttonImage = (UIButton *)[cell.contentView viewWithTag:6];
+            UIImage *image = [UIImage imageWithData:picture];
+            buttonImage.contentMode = UIViewContentModeScaleAspectFit;
+            UIImage *scaledImage = [self getScaledImage:image insideButton:buttonImage];
+            [buttonImage setImage:scaledImage forState:UIControlStateNormal];
         }
     }
-    else {
-        UIButton *buttonImage = (UIButton *)[cell.contentView viewWithTag:6];
-        UIImage *image = [UIImage imageWithData:picture];
-        buttonImage.contentMode = UIViewContentModeScaleAspectFit;
-        UIImage *scaledImage = [self getScaledImage:image insideButton:buttonImage];
-        [buttonImage setImage:scaledImage forState:UIControlStateNormal];
-    }
+    
+    __block NSData *profilePictureData = [self.photoDictionary objectForKey:profileFromId];
+    NSString *urlStringForProfilePicture = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture/type=small", profileFromId];
     
     dispatch_queue_t downloadQueue = dispatch_queue_create("Profile Image Downloader", NULL);
     dispatch_async(downloadQueue, ^{
@@ -736,7 +740,7 @@
         [segue.destinationViewController setTextEntryDelegate:self];
         [segue.destinationViewController setDictionaryForComment:sender];
         [segue.destinationViewController setSubmitButtonTitle:@"Post"];
-        [segue.destinationViewController setWindowTitle:[NSString stringWithFormat:@"Facebook", self.appConfiguration.appName]];
+        [segue.destinationViewController setWindowTitle:@"Facebook"];
         [segue.destinationViewController setType:TextEntryTypePost];
         [segue.destinationViewController setSupportPicture:YES];
     }

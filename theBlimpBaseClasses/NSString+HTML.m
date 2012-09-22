@@ -72,34 +72,52 @@
             [result appendString:@">"];
         else if ([scanner scanString:@"&#" intoString:NULL]) {
             BOOL gotNumber;
-            unsigned charCode;
+            unsigned short shortCharCode;
+            unsigned int intCharCode;
             NSString *xForHex = @"";
             
             // Is it hex or decimal?
             if ([scanner scanString:@"x" intoString:&xForHex]) {
-                gotNumber = [scanner scanHexInt:&charCode];
+                gotNumber = [scanner scanHexInt:&intCharCode];
+                if (gotNumber)
+                {
+                    [result appendFormat:@"%u", intCharCode];
+                    [scanner scanString:@";" intoString:NULL];
+                }
+                else {
+                    NSString *unknownEntity = @"";
+                    
+                    [scanner scanUpToCharactersFromSet:boundaryCharacterSet intoString:&unknownEntity];
+                    
+                    [result appendFormat:@"&#%@%@", xForHex, unknownEntity];
+                    
+                    //[scanner scanUpToString:@";" intoString:&unknownEntity];
+                    //[result appendFormat:@"&#%@%@;", xForHex, unknownEntity];
+                    NSLog(@"Expected numeric character entity but got &#%@%@;", xForHex, unknownEntity);
+                    
+                }
+                
             }
             else {
-                gotNumber = [scanner scanInt:(int*)&charCode];
+                gotNumber = [scanner scanInt:(int*)&shortCharCode];
+                if (gotNumber)
+                {
+                    [result appendFormat:@"%C", shortCharCode];
+                    [scanner scanString:@";" intoString:NULL];
+                }
+                else {
+                    NSString *unknownEntity = @"";
+                    
+                    [scanner scanUpToCharactersFromSet:boundaryCharacterSet intoString:&unknownEntity];
+                    
+                    [result appendFormat:@"&#%@%@", xForHex, unknownEntity];
+                    
+                    //[scanner scanUpToString:@";" intoString:&unknownEntity];
+                    //[result appendFormat:@"&#%@%@;", xForHex, unknownEntity];
+                    NSLog(@"Expected numeric character entity but got &#%@%@;", xForHex, unknownEntity);
+                    
+                }
             }
-            
-            if (gotNumber) {
-                [result appendFormat:@"%C", charCode];
-                [scanner scanString:@";" intoString:NULL];
-            }
-            else {
-                NSString *unknownEntity = @"";
-                
-                [scanner scanUpToCharactersFromSet:boundaryCharacterSet intoString:&unknownEntity];
-                
-                [result appendFormat:@"&#%@%@", xForHex, unknownEntity];
-                
-                //[scanner scanUpToString:@";" intoString:&unknownEntity];
-                //[result appendFormat:@"&#%@%@;", xForHex, unknownEntity];
-                NSLog(@"Expected numeric character entity but got &#%@%@;", xForHex, unknownEntity);
-                
-            }
-            
         }
         else {
             NSString *amp;
