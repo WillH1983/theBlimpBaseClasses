@@ -542,6 +542,7 @@
         if (!commentButton)
         {
             commentButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            commentButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
             
             //Set the comment button target action to call a method when the user wants to comment on a post
             [commentButton addTarget:self action:@selector(commentsButtonPushed:) forControlEvents:UIControlEventTouchUpInside];

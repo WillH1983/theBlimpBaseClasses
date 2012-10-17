@@ -22,7 +22,7 @@
 @synthesize oldBarButtonItem = _oldBarButtonItem;
 @synthesize activityIndicator = _activityIndicator;
 @synthesize programmedWebView = _programmedWebView;
-
+@synthesize completionBlock = _completionBlock;
 
 - (id)init
 {
@@ -99,7 +99,7 @@
     NSString *tmpString = [url absoluteString];
     if ([tmpString isEqualToString:@"https://www.planningcenteronline.com/login"]) 
     {
-        [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+        [[self presentingViewController] dismissViewControllerAnimated:YES completion:self.completionBlock];
         return NO;
     }
     else return YES;
