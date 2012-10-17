@@ -70,4 +70,14 @@
     return [self objectForKey:@"twitterUserNameToRequest"];
 }
 
+- (void)setFacebookCommentButtonImageTitle:(NSString *)facebookCommentButtonImageTitle
+{
+    [self setObject:facebookCommentButtonImageTitle forKey:@"facebookCommentButtonImageTitle"];
+}
+
+- (NSString *)facebookCommentButtonImageTitle
+{
+    return [self objectForKey:@"facebookCommentButtonImageTitle"];
+}
+
 @end

@@ -539,8 +539,29 @@
         //Retrieve the label that will be used to display the date of post
         datePosted = (UILabel *)[cell.contentView viewWithTag:8];
         
-        //Set the comment button target action to call a method when the user wants to comment on a post
-        [commentButton addTarget:self action:@selector(commentsButtonPushed:) forControlEvents:UIControlEventTouchUpInside];
+        if (!commentButton)
+        {
+            commentButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            
+            //Set the comment button target action to call a method when the user wants to comment on a post
+            [commentButton addTarget:self action:@selector(commentsButtonPushed:) forControlEvents:UIControlEventTouchUpInside];
+            
+            commentButton.titleLabel.font = [UIFont boldSystemFontOfSize:15.0];
+            commentButton.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 10);
+            
+            commentButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+            //System Bold 15.0
+            commentButton.tag = 4;
+            
+            commentButton.frame = CGRectMake(likeButton.frame.origin.x - 5, likeButton.frame.origin.y + 5, cell.frame.size.width - 10, 30);
+            UIImage *facebookCommentButtonImage = [UIImage imageNamed:self.appConfiguration.facebookCommentButtonImageTitle];
+            UIEdgeInsets AcceptDeclineEdge = UIEdgeInsetsMake(20, 20, 20, 20);
+            UIImage *stretchableFacebookCommentButtonImage = [facebookCommentButtonImage resizableImageWithCapInsets:AcceptDeclineEdge];
+            [commentButton setBackgroundImage:stretchableFacebookCommentButtonImage forState:UIControlStateNormal];
+            [cell.contentView addSubview:commentButton];
+            [cell.contentView sendSubviewToBack:commentButton];
+            
+        }
         
         //Set the main comment button target action to call a method when the user wants to post to the apps wall
         [addCommentButton addTarget:self action:@selector(mainCommentsButtonPushed:) forControlEvents:UIControlEventTouchUpInside];
@@ -870,9 +891,10 @@
     }
     else if ([segue.identifier isEqualToString:@"Photo"])
     {
-        if ([sender isKindOfClass:[NSString class]])
+        if ([sender isKindOfClass:[NSDictionary class]])
         {
-            [segue.destinationViewController setFacebookPhotoObjectID:sender];
+            NSString *objectID = [sender valueForKey:@"object_id"];
+            [segue.destinationViewController setFacebookPhotoObjectID:objectID];
         }
     }
     else if ([segue.identifier isEqualToString:@"CommentOnPost"])

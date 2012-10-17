@@ -15,4 +15,5 @@
 @property (nonatomic, strong) NSString *facebookID;
 @property (nonatomic, strong) NSString *facebookFeedToRequest;
 @property (nonatomic, strong) NSString *twitterUserNameToRequest;
+@property (nonatomic, strong) NSString *facebookCommentButtonImageTitle;
 @end

@@ -44,19 +44,24 @@
     self.navigationBar.topItem.rightBarButtonItem = spinnerButton;
     
     [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@", self.facebookPhotoObjectID] completionHandler:^(FBRequestConnection *connection, id result, NSError  *error) {
-        NSURL *urlStringForProfile = [[NSURL alloc] initWithString:[result valueForKey:@"source"]];
+        NSString *stringURL = nil;
+        NSURL *urlStringForProfile = nil;
+        
+        
+        if (result) stringURL = [result valueForKey:@"source"];
+        if (stringURL) urlStringForProfile = [[NSURL alloc] initWithString:stringURL];
         UIImage *tmpImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:urlStringForProfile]];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.imageForImageView = tmpImage;
-            self.scrollView.zoomScale = 1;
-            self.imageView.image = self.imageForImageView;
-            [self.imageView sizeToFit];
-            self.scrollView.contentSize = self.imageView.bounds.size;
-            CGRect tmpRect = CGRectMake(0, 0, self.imageForImageView.size.width, self.imageForImageView.size.height);
-            [self.scrollView zoomToRect:tmpRect animated:NO];
-            self.navigationBar.topItem.leftBarButtonItem = oldBarButtonItem;
-            [spinner stopAnimating];
-        });
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.imageForImageView = tmpImage;
+                self.scrollView.zoomScale = 1;
+                self.imageView.image = self.imageForImageView;
+                [self.imageView sizeToFit];
+                self.scrollView.contentSize = self.imageView.bounds.size;
+                CGRect tmpRect = CGRectMake(0, 0, self.imageForImageView.size.width, self.imageForImageView.size.height);
+                [self.scrollView zoomToRect:tmpRect animated:NO];
+                self.navigationBar.topItem.leftBarButtonItem = oldBarButtonItem;
+                [spinner stopAnimating];
+            });
     }];
 }
 
