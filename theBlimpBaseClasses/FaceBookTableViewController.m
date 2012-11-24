@@ -554,7 +554,7 @@
             //System Bold 15.0
             commentButton.tag = 4;
             
-            commentButton.frame = CGRectMake(likeButton.frame.origin.x - 5, likeButton.frame.origin.y + 5, cell.frame.size.width - 10, 30);
+            commentButton.frame = CGRectMake(likeButton.frame.origin.x - 5, likeButton.frame.origin.y + 10, cell.frame.size.width - 10, 20);
             UIImage *facebookCommentButtonImage = [UIImage imageNamed:self.appConfiguration.facebookCommentButtonImageTitle];
             UIEdgeInsets AcceptDeclineEdge = UIEdgeInsetsMake(20, 20, 20, 20);
             UIImage *stretchableFacebookCommentButtonImage = [facebookCommentButtonImage resizableImageWithCapInsets:AcceptDeclineEdge];
@@ -737,8 +737,8 @@
             if (pictureID)
             {
                 [FBRequestConnection startWithGraphPath:[NSString stringWithFormat:@"%@", pictureID] completionHandler:^(FBRequestConnection *connection, id result, NSError  *error) {
-                    NSURL *url = [[NSURL alloc] initWithString:[result valueForKey:@"source"]];
-                    picture = [NSData dataWithContentsOfURL:url];
+                    NSString *urlString = [result valueForKey:@"source"];
+                    if (urlString) picture = [NSData dataWithContentsOfURL:[NSURL URLWithString:urlString]];
                     if (picture) [self.photoDictionary setObject:picture forKey:pictureID];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         NSArray *tmpArray = [self.tableView indexPathsForVisibleRows];
@@ -774,8 +774,7 @@
         {
             if (profileFromId)
             {
-                NSURL *profileUrl = [[NSURL alloc] initWithString:urlStringForProfilePicture];
-                profilePictureData = [NSData dataWithContentsOfURL:profileUrl];
+                if (urlStringForProfilePicture) profilePictureData = [NSData dataWithContentsOfURL:[NSURL URLWithString:urlStringForProfilePicture]];
                 if (profilePictureData) [self.photoDictionary setObject:profilePictureData forKey:profileFromId];
                 NSLog(@"Profile Picture");
             }
@@ -927,9 +926,23 @@
     {
         
         NSMutableArray *array = [result mutableArrayValueForKey:@"data"];
+        NSMutableArray *modArray = [array mutableCopy];
+        
+        for (NSDictionary *element in array)
+        {
+            if (![element valueForKey:@"actions"]) [modArray removeObject:element];
+            
+            //Retrieve the type of facebook post that the tableview row will display
+            NSString *typeOfPost = [element valueForKeyPath:@"type"];
+            if ([typeOfPost isEqualToString:@"link"])
+            {
+                NSString *linkURL = [element valueForKeyPath:@"link"];
+                if (!linkURL) [modArray removeObject:element];
+            }
+        }
         
         //Set the property equal to the new comments array, which will then trigger a table reload
-        self.facebookArrayTableData = array;
+        self.facebookArrayTableData = modArray;
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{

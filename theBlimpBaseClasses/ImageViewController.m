@@ -83,11 +83,11 @@
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     self.scrollView.zoomScale = 1;
-    self.imageView.image = self.imageForImageView;
+    //self.imageView.image = self.imageForImageView;
     [self.imageView sizeToFit];
     self.scrollView.contentSize = self.imageView.bounds.size;
-    CGRect tmpRect = CGRectMake(0, 0, self.imageForImageView.size.width, self.imageForImageView.size.height);
-    [self.scrollView zoomToRect:tmpRect animated:NO];
+    //CGRect tmpRect = CGRectMake(0, 0, self.imageForImageView.size.width, self.imageForImageView.size.height);
+    //[self.scrollView zoomToRect:tmpRect animated:NO];
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView //1 line
