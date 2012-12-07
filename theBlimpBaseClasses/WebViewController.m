@@ -23,6 +23,8 @@
 @synthesize activityIndicator = _activityIndicator;
 @synthesize programmedWebView = _programmedWebView;
 @synthesize completionBlock = _completionBlock;
+@synthesize htmlString = _htmlString;
+@synthesize htmlTitle = _htmlTitle;
 
 - (id)init
 {
@@ -61,12 +63,37 @@
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(donePressed:)];
     self.navigationBar.topItem.leftBarButtonItem = button;
-    NSURLRequest *urlRequest = [[NSURLRequest alloc] initWithURL:self.urlToLoad];
-    self.webView.scalesPageToFit = YES;
-    [self.webView loadRequest:urlRequest];
-    [self.programmedWebView loadRequest:urlRequest];
-    self.title = @"Loading...";
-    self.navigationBar.topItem.title = @"Loading...";
+    
+    //Set the Imago Dei logo to the title view of the navigation controler
+    //With the content mode set to AspectFit
+    UIImage *logoImage = [UIImage imageNamed:@"imago-logo.png"];
+    UIImageView *logoImageView = [[UIImageView alloc] initWithImage:logoImage];
+    logoImageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.navigationItem.titleView = logoImageView;
+
+    if (self.htmlString && self.urlToLoad && self.htmlTitle)
+    {
+        NSString *cssPath = [[NSBundle mainBundle] pathForResource:@"style" ofType:@"css"];
+        
+        //do base url for css
+        NSString *path = [[NSBundle mainBundle] bundlePath];
+        NSURL *baseURL = [NSURL fileURLWithPath:path];
+        
+        NSString *html =[NSString stringWithFormat:@"<html><head><link rel=\"stylesheet\" href=\"%@\" type=\"text/css\" /></head><body><h1>%@</h1>%@</body></html>", cssPath,self.htmlTitle, self.htmlString];
+        NSLog(@"%@",html);
+        if (baseURL)[self.programmedWebView loadHTMLString:html baseURL:baseURL];
+        if (baseURL)[self.webView loadHTMLString:html baseURL:baseURL];
+        
+    }
+    else if (self.urlToLoad)
+    {
+        NSURLRequest *urlRequest = [[NSURLRequest alloc] initWithURL:self.urlToLoad];
+        self.webView.scalesPageToFit = YES;
+        [self.webView loadRequest:urlRequest];
+        [self.programmedWebView loadRequest:urlRequest];
+        self.title = @"Loading...";
+        self.navigationBar.topItem.title = @"Loading...";
+    }
 }
 
 - (void)viewDidUnload

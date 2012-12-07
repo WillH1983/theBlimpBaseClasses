@@ -13,9 +13,11 @@ typedef void(^WebViewCompletionBlock)(void);
 @interface WebViewController : UIViewController
 @property (nonatomic, strong) NSURL *urlToLoad;
 @property (nonatomic, strong) NSString *titleForWebView;
+@property (nonatomic, strong) NSString *htmlTitle;
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (strong, nonatomic) UINavigationBar *navigationBar;
 @property (nonatomic, strong) WebViewCompletionBlock completionBlock;
+@property (nonatomic, strong) NSString *htmlString;
 
 - (id)initWithToolbar:(BOOL)yesOrNo;
 
