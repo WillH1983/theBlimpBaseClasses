@@ -80,4 +80,14 @@
     return [self objectForKey:@"facebookCommentButtonImageTitle"];
 }
 
+- (void)setAppNavigationBarLogoName:(NSString *)appNavigationBarLogo
+{
+    [self setObject:appNavigationBarLogo forKey:@"appNavigationBarLogo"];
+}
+
+- (NSString *)appNavigationBarLogoName
+{
+    return [self objectForKey:@"appNavigationBarLogo"];
+}
+
 @end

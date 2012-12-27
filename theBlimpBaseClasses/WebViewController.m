@@ -7,11 +7,13 @@
 //
 
 #import "WebViewController.h"
+#import "NSMutableDictionary+appConfiguration.h"
 
 @interface WebViewController () <UIWebViewDelegate>
 @property (nonatomic, strong) UIBarButtonItem *oldBarButtonItem;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
 @property (nonatomic, strong) UIWebView *programmedWebView;
+@property (nonatomic, strong) NSMutableDictionary *appConfiguration;
 @end
 
 @implementation WebViewController
@@ -25,6 +27,7 @@
 @synthesize completionBlock = _completionBlock;
 @synthesize htmlString = _htmlString;
 @synthesize htmlTitle = _htmlTitle;
+@synthesize appConfiguration = _appConfiguration;
 
 - (id)init
 {
@@ -60,13 +63,18 @@
 {
     [super viewWillAppear:animated];
     
+    //Pull the app delegate, this needs to be generic due to this class being included in other apps
+    //Save the appConfiguration data from the app delegate
+    id appDelegate = (id)[[UIApplication sharedApplication] delegate];
+    self.appConfiguration = [appDelegate appConfiguration];
+    
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(donePressed:)];
     self.navigationBar.topItem.leftBarButtonItem = button;
     
     //Set the Imago Dei logo to the title view of the navigation controler
     //With the content mode set to AspectFit
-    UIImage *logoImage = [UIImage imageNamed:@"imago-logo.png"];
+    UIImage *logoImage = [UIImage imageNamed:self.appConfiguration.appNavigationBarLogoName];
     UIImageView *logoImageView = [[UIImageView alloc] initWithImage:logoImage];
     logoImageView.contentMode = UIViewContentModeScaleAspectFit;
     self.navigationItem.titleView = logoImageView;
