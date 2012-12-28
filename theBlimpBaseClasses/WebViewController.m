@@ -87,7 +87,7 @@
         NSString *path = [[NSBundle mainBundle] bundlePath];
         NSURL *baseURL = [NSURL fileURLWithPath:path];
         
-        NSString *html =[NSString stringWithFormat:@"<html><head><link rel=\"stylesheet\" href=\"%@\" type=\"text/css\" /></head><body><h1>%@</h1>%@</body></html>", cssPath,self.htmlTitle, self.htmlString];
+        NSString *html =[NSString stringWithFormat:@"<html><head><link rel=\"stylesheet\" href=\"%@\" type=\"text/css\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1\"></head><body><h1>%@</h1>%@</body></html>", cssPath,self.htmlTitle, self.htmlString];
         NSLog(@"%@",html);
         if (baseURL)[self.programmedWebView loadHTMLString:html baseURL:baseURL];
         if (baseURL)[self.webView loadHTMLString:html baseURL:baseURL];
