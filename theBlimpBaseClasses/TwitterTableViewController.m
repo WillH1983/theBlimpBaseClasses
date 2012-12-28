@@ -200,11 +200,26 @@
     if (timeline) 
     {
         // We have an object that we can parse
-        if ([timeline valueForKey:@"error"])
+        if ([timeline valueForKey:@"error"] || [timeline valueForKey:@"errors"])
         {
             dispatch_async(dispatch_get_main_queue(), ^{
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ - Twitter", self.appConfiguration.appName] 
-                                                                    message:[timeline valueForKey:@"error"] 
+                NSString *errorString = [timeline valueForKey:@"error"];
+                id error = nil;
+                if (!errorString)
+                {
+                    id errors = [timeline valueForKey:@"errors"];
+                    if ([errors isKindOfClass:[NSArray class]])
+                    {
+                        error = [errors lastObject];
+                    }
+                    
+                    if ([error isKindOfClass:[NSDictionary class]])
+                    {
+                        errorString = [error valueForKey:@"message"];
+                    }
+                }
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ - Twitter", self.appConfiguration.appName]
+                                                                    message:errorString
                                                                     delegate:nil 
                                                             cancelButtonTitle:@"Okay" 
                                                             otherButtonTitles: nil];
@@ -404,7 +419,7 @@
     {
         [self.activityIndicator startAnimating];
         
-        NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1/statuses/retweet/%@.json", [self.tweetToRetweet objectForKey:TWEET_ID]];
+        NSString *retweetString = [NSString stringWithFormat:@"http://api.twitter.com/1.1/statuses/retweet/%@.json", [self.tweetToRetweet objectForKey:TWEET_ID]];
         NSURL *url = [NSURL URLWithString:retweetString];
         [self twitterPostRequestWithURL:url twitterParameters:nil withRequestType:TWRequestTypeRetweet];
         self.tweetToRetweet = nil;
