@@ -49,7 +49,7 @@
     }
     else
     {
-        self.programmedWebView = [[UIWebView alloc] initWithFrame:self.view.bounds];
+         self.programmedWebView = [[UIWebView alloc] initWithFrame:self.view.bounds];
         self.programmedWebView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
     }
     
