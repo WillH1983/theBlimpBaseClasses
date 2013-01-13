@@ -132,7 +132,7 @@
 {
     NSURL *url = request.URL;
     NSString *tmpString = [url absoluteString];
-    if ([tmpString isEqualToString:@"https://www.planningcenteronline.com/login"]) 
+    if ([tmpString isEqualToString:@"https://www.planningcenteronline.com/dashboard?id=0"]) 
     {
         [[self presentingViewController] dismissViewControllerAnimated:YES completion:self.completionBlock];
         return NO;
